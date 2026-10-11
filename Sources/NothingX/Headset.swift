@@ -1,10 +1,11 @@
+import CoreBluetooth
 import Foundation
 import IOBluetooth
 import NothingKit
 
 /// L'appareil relié au Mac, son état, et les réglages qu'on lui envoie.
 final class Headset: NSObject, ObservableObject {
-    enum Status { case absent, connecting, connected }
+    enum Status { case absent, connecting, connected, unauthorized }
 
     @Published private(set) var status = Status.absent
     @Published private(set) var state = DeviceState()
@@ -13,6 +14,29 @@ final class Headset: NSObject, ObservableObject {
 
     var model: Model? { Model.named(name) }
 
+    /// Ce qu'il faut faire quand aucun appareil n'est affiché.
+    var hint: String {
+        switch status {
+        case .unauthorized: "Bluetooth n'est pas autorisé pour cette app : Réglages › Confidentialité et sécurité › Bluetooth."
+        case .connecting: "Connexion en cours…"
+        default: "Allumez votre appareil et reliez-le au Mac dans Réglages › Bluetooth."
+        }
+    }
+
+    var statusLabel: String {
+        switch status {
+        case .connected: "Connecté"
+        case .connecting: "Connexion en cours"
+        case .unauthorized: "Non autorisé"
+        case .absent: "Déconnecté"
+        }
+    }
+
+    /// Le volet des réglages à ouvrir pour débloquer la situation.
+    var settingsURL: URL {
+        URL(string: status == .unauthorized ? "x-apple.systempreferences:com.apple.preference.security?Privacy_Bluetooth" : "x-apple.systempreferences:com.apple.BluetoothSettings")!
+    }
+
     /// Toutes les trames reçues, pour le diagnostic.
     var onFrame: ((Frame) -> Void)?
 
@@ -20,6 +44,7 @@ final class Headset: NSObject, ObservableObject {
     private var connectWatch: IOBluetoothUserNotification?
     private var disconnectWatch: IOBluetoothUserNotification?
     private var poll: Timer?
+    private var permission: BluetoothPermission?
     private let isDemo: Bool
 
     init(demo: Bool = false) {
@@ -29,10 +54,16 @@ final class Headset: NSObject, ObservableObject {
     }
 
     func start() {
-        guard !isDemo, connectWatch == nil else { return }
-        connectWatch = IOBluetoothDevice.register(forConnectNotifications: self, selector: #selector(deviceConnected(_:device:)))
-        attach()
-        poll = Timer.scheduledTimer(withTimeInterval: 120, repeats: true) { [weak self] _ in self?.link?.send(Read.battery.rawValue) }
+        guard !isDemo, permission == nil else { return }
+        let permission = BluetoothPermission()
+        self.permission = permission
+        permission.request { [weak self] allowed in
+            guard let self else { return }
+            guard allowed else { return self.status = .unauthorized }
+            self.connectWatch = IOBluetoothDevice.register(forConnectNotifications: self, selector: #selector(self.deviceConnected(_:device:)))
+            self.attach()
+            self.poll = Timer.scheduledTimer(withTimeInterval: 120, repeats: true) { [weak self] _ in self?.link?.send(Read.battery.rawValue) }
+        }
     }
 
     // MARK: Réglages
@@ -129,5 +160,29 @@ final class Headset: NSObject, ObservableObject {
             (0x4018, [0x04, 0x06, 0x0A, 0x07, 0x01, 0x06, 0x0A, 0x01, 0x0B, 0x06, 0x05, 0x01, 0x23, 0x06, 0x01, 0x07, 0x16]),
         ]
         for (command, payload) in replies { state.apply(Frame(command: command, payload: payload)) }
+    }
+}
+
+/// Demande l'accord Bluetooth sans figer l'app. Le premier appel à IOBluetooth attend la réponse
+/// de l'utilisateur sur le fil principal : on ne s'en sert donc qu'une fois l'accord donné.
+private final class BluetoothPermission: NSObject, CBCentralManagerDelegate {
+    private var manager: CBCentralManager?
+    private var answer: ((Bool) -> Void)?
+
+    func request(_ answer: @escaping (Bool) -> Void) {
+        switch CBCentralManager.authorization {
+        case .allowedAlways: answer(true)
+        case .denied, .restricted: answer(false)
+        default:
+            self.answer = answer
+            manager = CBCentralManager(delegate: self, queue: .main, options: [CBCentralManagerOptionShowPowerAlertKey: false])
+        }
+    }
+
+    func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        guard CBCentralManager.authorization != .notDetermined else { return }
+        answer?(CBCentralManager.authorization == .allowedAlways)
+        answer = nil
+        manager = nil
     }
 }

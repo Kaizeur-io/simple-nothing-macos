@@ -39,5 +39,7 @@ for size in 16 32 128 256 512; do
 done
 iconutil -c icns "$set" -o "$res/AppIcon.icns"
 
-codesign --force --sign - "$app" >/dev/null 2>&1
+# Signature locale. L'identité est fixée sur l'identifiant de l'app : sans cela elle changerait à chaque
+# compilation et macOS redemanderait l'accord Bluetooth à chaque fois.
+codesign --force --sign - -r="designated => identifier \"local.nothing-mac.app\"" "$app" >/dev/null 2>&1
 open -n "$app" --args "$@"

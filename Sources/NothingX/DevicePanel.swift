@@ -31,7 +31,7 @@ struct DevicePanel: View {
             Spacer(minLength: 16)
             Text(headset.name.isEmpty ? tr("Aucun appareil") : headset.name).font(.nSerif(23)).foregroundStyle(Color.nText)
                 .lineLimit(1).minimumScaleFactor(0.7).padding(.horizontal, 14)
-            battery.padding(.top, 12).frame(height: 40, alignment: .top)
+            battery.padding(.top, 12).frame(height: 52, alignment: .top)
             Spacer(minLength: 10)
             footer
         }
@@ -59,15 +59,15 @@ struct DevicePanel: View {
             }
             .accessibilityElement(children: .ignore).accessibilityLabel(tr("Batterie %d %%", level.percent))
         } else if !connected {
-            Text(tr(headset.status == .connecting ? "Connexion en cours…" : "Allumez votre appareil et reliez-le\nau Mac dans Réglages › Bluetooth."))
-                .font(.system(size: 11)).foregroundStyle(Color.nMuted).multilineTextAlignment(.center)
+            Text(tr(headset.hint)).font(.system(size: 11)).foregroundStyle(Color.nMuted).multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true).padding(.horizontal, 22)
         }
     }
 
     private var footer: some View {
         HStack(spacing: 6) {
             Circle().fill(connected ? Color.nGreen : Color.nMuted).frame(width: 5, height: 5)
-            Caps(connected ? "Connecté" : headset.status == .connecting ? "Connexion en cours" : "Déconnecté")
+            Caps(headset.statusLabel)
             Spacer()
             if connected { Caps([headset.state.codec?.name, headset.state.firmware].compactMap { $0 }.joined(separator: " · ")) }
         }

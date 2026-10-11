@@ -13,7 +13,9 @@
 "Connexion en cours" = "Connecting";
 "Connexion en cours…" = "Connecting…";
 "Déconnecté" = "Disconnected";
-"Allumez votre appareil et reliez-le\nau Mac dans Réglages › Bluetooth." = "Turn your device on and connect it\nto this Mac in Settings › Bluetooth.";
+"Bluetooth n'est pas autorisé pour cette app : Réglages › Confidentialité et sécurité › Bluetooth." = "Bluetooth is not allowed for this app: Settings › Privacy & Security › Bluetooth.";
+"Non autorisé" = "Not allowed";
+"Ouvrir les réglages" = "Open settings";
 "Allumez votre appareil et reliez-le au Mac dans Réglages › Bluetooth." = "Turn your device on and connect it to this Mac in Settings › Bluetooth.";
 "Réglages Bluetooth" = "Bluetooth settings";
 "%d %%" = "%d%%";

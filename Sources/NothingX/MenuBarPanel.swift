@@ -47,12 +47,12 @@ struct MenuBarPanel: View {
             } else {
                 rule
                 VStack(alignment: .leading, spacing: 12) {
-                    Text(tr("Allumez votre appareil et reliez-le au Mac dans Réglages › Bluetooth."))
+                    Text(tr(headset.hint))
                         .font(.system(size: 12)).foregroundStyle(Color.nMuted).fixedSize(horizontal: false, vertical: true)
                     Button {
-                        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.BluetoothSettings")!)
+                        NSWorkspace.shared.open(headset.settingsURL)
                     } label: {
-                        Caps("Réglages Bluetooth", size: 9, color: .nOnText).padding(.horizontal, 16).frame(height: 30).background(Color.nText, in: Capsule())
+                        Caps(headset.status == .unauthorized ? "Ouvrir les réglages" : "Réglages Bluetooth", size: 9, color: .nOnText).padding(.horizontal, 16).frame(height: 30).background(Color.nText, in: Capsule())
                     }
                     .buttonStyle(.plain)
                 }
@@ -99,7 +99,7 @@ struct MenuBarPanel: View {
                     .lineLimit(1).minimumScaleFactor(0.75)
                 HStack(spacing: 5) {
                     Circle().fill(connected ? Color.nGreen : Color.nMuted).frame(width: 5, height: 5)
-                    Caps(connected ? "Connecté" : headset.status == .connecting ? "Connexion en cours" : "Déconnecté")
+                    Caps(headset.statusLabel)
                     if connected, let codec = state.codec { Caps("· " + codec.name) }
                 }
             }
