@@ -3,7 +3,20 @@
 # Appelé par tools/app.sh (lancer) et tools/install.sh (installer).
 set -e
 cd "$(dirname "$0")/.."
-swift build -c release 2>&1 | grep -E "error|warning|Compiling|Build" || true
+if ! command -v swift >/dev/null 2>&1; then
+  echo "Il manque les outils de développement d'Apple. Lancez « xcode-select --install », attendez la fin de l'installation, puis relancez ce script." >&2
+  exit 1
+fi
+if [ "$(sw_vers -productVersion | cut -d. -f1)" -lt 14 ]; then
+  echo "macOS 14 (Sonoma) ou plus récent est nécessaire." >&2
+  exit 1
+fi
+if ! swift build -c release >.build-log 2>&1; then
+  cat .build-log >&2
+  rm -f .build-log
+  exit 1
+fi
+rm -f .build-log
 app=".build/Nothing X.app"
 res="$app/Contents/Resources"
 rm -rf "$app"

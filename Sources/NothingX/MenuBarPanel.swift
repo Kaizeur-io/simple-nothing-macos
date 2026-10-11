@@ -86,7 +86,7 @@ struct MenuBarPanel: View {
                 if headset.model == .headphonePro || headset.name.isEmpty, let image = finish.frontImage {
                     Image(nsImage: image).resizable().interpolation(.high).scaledToFit()
                 } else {
-                    Image(systemName: headset.model?.isHeadphones == false ? "earbuds" : "headphones").font(.system(size: 34, weight: .light)).foregroundStyle(Color.nText)
+                    DeviceGlyph(isHeadphones: headset.model?.isHeadphones != false).padding(6)
                 }
             }
             .frame(width: 64, height: 64).opacity(connected ? 1 : 0.35)
@@ -103,7 +103,7 @@ struct MenuBarPanel: View {
             if connected, let level = state.mainBattery {
                 VStack(alignment: .trailing, spacing: 6) {
                     HStack(alignment: .firstTextBaseline, spacing: 3) {
-                        Text("\(level.percent)").font(.nDot(30))
+                        DotNumber(value: level.percent, size: 30)
                         Text("%").font(.nMono(11))
                     }
                     .foregroundStyle(level.percent <= 15 ? Color.nRed : Color.nText)

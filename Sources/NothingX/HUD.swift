@@ -92,14 +92,14 @@ struct ArrivalCard: View {
                     if headset.model == .headphonePro, let image = finish.frontImage {
                         Image(nsImage: image).resizable().interpolation(.high).scaledToFit()
                     } else {
-                        Image(systemName: headset.model?.isHeadphones == false ? "earbuds" : "headphones").font(.system(size: 84, weight: .ultraLight)).foregroundStyle(Color.nText)
+                        DeviceGlyph(isHeadphones: headset.model?.isHeadphones != false).padding(.vertical, 16)
                     }
                 }
                 .frame(height: 150).padding(.top, 14).padding(.bottom, 10)
                 Text(headset.name).font(.nSerif(25)).foregroundStyle(Color.nText).lineLimit(1).minimumScaleFactor(0.7)
                 if let level = headset.state.mainBattery {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
-                        Text("\(level.percent)").font(.nDot(36))
+                        DotNumber(value: level.percent, size: 36)
                         Text("%").font(.nMono(13))
                     }
                     .foregroundStyle(level.percent <= 15 ? Color.nRed : Color.nText).padding(.top, 10)

@@ -2,6 +2,24 @@
 
 Une application macOS pour régler les casques et écouteurs Nothing et CMF, que l'app officielle ne couvre que sur téléphone. Ce projet n'est ni affilié à Nothing Technology, ni soutenu par elle.
 
+![La fenêtre de l'application](docs/apercu-fenetre.png)
+
+| Dans la barre des menus | À la connexion |
+|---|---|
+| ![Panneau de la barre des menus](docs/apercu-barre-des-menus.png) | ![Carte de connexion](docs/apercu-carte.png) |
+
+## Installation
+
+Il faut macOS 14 ou plus récent et les outils en ligne de commande d'Apple (`xcode-select --install` s'ils manquent ; Xcode n'est pas nécessaire). Depuis le dossier du dépôt :
+
+```sh
+tools/install.sh
+```
+
+Le script compile l'app (environ une minute la première fois), la place dans Applications et l'ouvre. Il reste deux gestes : cliquer sur « Autoriser » quand macOS demande l'accès Bluetooth, et jumeler le casque ou les écouteurs au Mac dans Réglages Système › Bluetooth si ce n'est pas déjà fait.
+
+Vous passez par un assistant de programmation ? Donnez-lui le dépôt et demandez-lui de l'installer : [AGENTS.md](AGENTS.md) lui dit quoi faire.
+
 ## Où en est le projet
 
 - **Maquettes interactives** : faites. Deux versions, jour et nuit, tout l'état y est simulé.
@@ -33,21 +51,13 @@ tools/
 docs/protocole.md      ce qui est vérifié du protocole
 ```
 
-## Lancer l'application
-
-Il suffit des outils en ligne de commande d'Apple (`xcode-select --install`), Xcode n'est pas nécessaire.
+## Travailler sur l'app
 
 ```sh
 tools/app.sh
 ```
 
-Pour s'en servir au quotidien, mieux vaut l'installer :
-
-```sh
-tools/install.sh
-```
-
-L'app vit dans la barre des menus : fermer la fenêtre ne la quitte pas, et elle ne garde une icône dans le Dock que tant que la fenêtre est ouverte. Avec « Ouvrir au démarrage du Mac » (onglet Appareil), elle est là dès l'ouverture de session et annonce l'appareil quand il se connecte. Ce réglage demande que l'app soit dans `/Applications`.
+Ce script lance l'app depuis le dossier du projet, sans toucher à la copie installée. L'app vit dans la barre des menus : fermer la fenêtre ne la quitte pas, et elle ne garde une icône dans le Dock que tant que la fenêtre est ouverte. Avec « Ouvrir au démarrage du Mac » (onglet Appareil), elle est là dès l'ouverture de session et annonce l'appareil quand il se connecte. Ce réglage demande que l'app soit dans `/Applications`.
 
 macOS demande l'autorisation Bluetooth au premier lancement. Sans appareil sous la main, `tools/app.sh --demo` montre l'app avec un état factice. Les tests se lancent avec `swift test`.
 
@@ -89,7 +99,7 @@ Puis ouvrir `http://localhost:4173/v2.html`. La barre noire en bas de page pilot
 
 ## Ce qui reste hors du dépôt
 
-Les photos des appareils et les polices appartiennent à Nothing (et à Lineto pour Lettera Mono) : elles ne sont pas dans le dépôt. Sans elles tout fonctionne, avec des pictogrammes et des polices de remplacement. Pour retrouver l'aspect d'origine sur votre machine, placez vos propres fichiers dans `originaux/`, que git ignore :
+Les photos des appareils et les polices appartiennent à Nothing (et à Lineto pour Lettera Mono) : elles ne sont pas dans le dépôt. Sans elles tout fonctionne, comme sur les captures ci-dessus : l'app dessine elle-même l'appareil et les grands chiffres en matrice de points, et prend ses caractères dans les polices du système (Bodoni 72 pour les noms, la police à chasse fixe du système pour les étiquettes). Pour retrouver l'aspect d'origine sur votre machine, placez vos propres fichiers dans `originaux/`, que git ignore :
 
 | Dossier | Contenu | Utilisé par |
 |---|---|---|

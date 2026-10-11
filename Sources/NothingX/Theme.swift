@@ -44,7 +44,7 @@ extension Font {
     static func nSerif(_ size: CGFloat) -> Font { Typeface.headline.map { .custom($0, size: size) } ?? .custom("Bodoni 72", size: size) }
     /// Étiquettes et valeurs techniques.
     static func nMono(_ size: CGFloat) -> Font { Typeface.mono.map { .custom($0, size: size) } ?? .system(size: size, design: .monospaced) }
-    /// Grands chiffres en matrice de points.
+    /// Grands chiffres en matrice de points ; sans la police, `DotNumber` les dessine lui-même.
     static func nDot(_ size: CGFloat) -> Font { Typeface.dot.map { .custom($0, size: size) } ?? .system(size: size * 0.8, weight: .semibold, design: .monospaced) }
 }
 

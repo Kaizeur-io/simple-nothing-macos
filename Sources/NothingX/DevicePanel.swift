@@ -52,8 +52,7 @@ struct DevicePanel: View {
         if headset.model == .headphonePro || headset.name.isEmpty, let image = finish.image {
             Image(nsImage: image).resizable().interpolation(.high).scaledToFit()
         } else {
-            Image(systemName: headset.model?.isHeadphones == false ? "earbuds" : "headphones").font(.system(size: 110, weight: .ultraLight))
-                .foregroundStyle(Color.nText).frame(maxWidth: .infinity, maxHeight: .infinity)
+            DeviceGlyph(isHeadphones: headset.model?.isHeadphones != false).padding(28).frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 
