@@ -1,4 +1,5 @@
 import AppKit
+import NothingKit
 import SwiftUI
 
 extension Color {
@@ -21,9 +22,35 @@ extension Color {
     static let nGreen = adaptive(0x1FA84F, 0x1FA84F)
 }
 
+/// Les polices de Nothing ne sont pas libres : l'app les utilise si tools/app.sh les a trouvées
+/// dans originaux/polices/, et se rabat sinon sur des polices du système.
+enum Typeface {
+    static func register() {
+        for url in Bundle.main.urls(forResourcesWithExtension: "otf", subdirectory: nil) ?? [] {
+            CTFontManagerRegisterFontsForURL(url as CFURL, .process, nil)
+        }
+    }
+
+    private static func available(_ name: String) -> String? { NSFont(name: name, size: 12) == nil ? nil : name }
+
+    static let headline = available("NType82-Headline")
+    static let mono = available("LetteraMonoLL-Regular")
+    static let dot = available("Ndot-55")
+}
+
 extension Font {
-    static func nSerif(_ size: CGFloat) -> Font { .custom("Bodoni 72", size: size) }
-    static func nMono(_ size: CGFloat) -> Font { .system(size: size, design: .monospaced) }
+    /// Titres : nom de l'appareil.
+    static func nSerif(_ size: CGFloat) -> Font { Typeface.headline.map { .custom($0, size: size) } ?? .custom("Bodoni 72", size: size) }
+    /// Étiquettes et valeurs techniques.
+    static func nMono(_ size: CGFloat) -> Font { Typeface.mono.map { .custom($0, size: size) } ?? .system(size: size, design: .monospaced) }
+    /// Grands chiffres en matrice de points.
+    static func nDot(_ size: CGFloat) -> Font { Typeface.dot.map { .custom($0, size: size) } ?? .system(size: size * 0.8, weight: .semibold, design: .monospaced) }
+}
+
+/// Traduction : les clés sont les textes français, l'anglais est dans Traductions/en.lproj.
+func tr(_ key: String, _ arguments: CVarArg...) -> String {
+    let format = Bundle.main.localizedString(forKey: key, value: key, table: nil)
+    return arguments.isEmpty ? format : String(format: format, arguments: arguments)
 }
 
 /// Étiquette en capitales espacées, la signature typographique de Nothing.
@@ -37,7 +64,7 @@ struct Caps: View {
     }
 
     var body: some View {
-        Text(text.uppercased()).font(.nMono(size)).tracking(size * 0.18).foregroundStyle(color).lineLimit(1)
+        Text(tr(text).uppercased()).font(.nMono(size)).tracking(size * 0.18).foregroundStyle(color).lineLimit(1)
     }
 }
 
@@ -57,8 +84,8 @@ struct CardHead: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
-            Text(title).font(.system(size: 13, weight: .semibold)).foregroundStyle(Color.nText)
-            Text(subtitle).font(.system(size: 11)).foregroundStyle(Color.nMuted).lineLimit(1)
+            Text(tr(title)).font(.system(size: 13, weight: .semibold)).foregroundStyle(Color.nText)
+            Text(tr(subtitle)).font(.system(size: 11)).foregroundStyle(Color.nMuted).lineLimit(1)
         }
     }
 }
@@ -76,7 +103,7 @@ struct ModeButton: View {
                 Image(systemName: symbol).font(.system(size: 17)).frame(width: 46, height: 46)
                     .foregroundStyle(isOn ? Color.nOnText : Color.nText)
                     .background(isOn ? Color.nText : Color.nWell, in: Circle())
-                Text(label).font(.system(size: 11, weight: isOn ? .semibold : .regular))
+                Text(tr(label)).font(.system(size: 11, weight: isOn ? .semibold : .regular))
                     .foregroundStyle(isOn ? Color.nText : Color.nMuted).lineLimit(1)
             }
             .frame(maxWidth: .infinity).contentShape(Rectangle())
@@ -133,8 +160,8 @@ struct Row<Trailing: View>: View {
         HStack(spacing: 12) {
             if let symbol { Image(systemName: symbol).font(.system(size: 14)).foregroundStyle(Color.nText).frame(width: 22) }
             VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.system(size: 13)).foregroundStyle(Color.nText)
-                if let subtitle { Text(subtitle).font(.system(size: 11)).foregroundStyle(Color.nMuted) }
+                Text(tr(title)).font(.system(size: 13)).foregroundStyle(Color.nText)
+                if let subtitle { Text(tr(subtitle)).font(.system(size: 11)).foregroundStyle(Color.nMuted) }
             }
             Spacer(minLength: 12)
             trailing
@@ -147,4 +174,77 @@ struct SectionTitle: View {
     let text: String
     init(_ text: String) { self.text = text }
     var body: some View { Caps(text, size: 10).padding(.leading, 4).padding(.top, 6) }
+}
+
+/// Valeur cliquable qui ouvre un menu de choix.
+struct ValueMenu: View {
+    let value: String
+    let options: [(label: String, pick: () -> Void)]
+
+    var body: some View {
+        Menu {
+            ForEach(Array(options.enumerated()), id: \.offset) { _, option in Button(tr(option.label), action: option.pick) }
+        } label: {
+            Text(tr(value)).font(.system(size: 12))
+        }
+        .menuStyle(.borderlessButton).fixedSize()
+    }
+}
+
+/// Ligne à interrupteur : pictogramme, titre, état.
+struct ToggleRow: View {
+    var symbol: String?
+    let title: String
+    var subtitle: String?
+    let isOn: Bool
+    let set: (Bool) -> Void
+
+    var body: some View {
+        Toggle(isOn: Binding(get: { isOn }, set: set)) {
+            HStack(spacing: 12) {
+                if let symbol { Image(systemName: symbol).font(.system(size: 14)).foregroundStyle(Color.nText).frame(width: 22) }
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(tr(title)).font(.system(size: 13)).foregroundStyle(Color.nText)
+                    if let subtitle { Text(tr(subtitle)).font(.system(size: 11)).foregroundStyle(Color.nMuted) }
+                }
+                Spacer()
+            }
+        }
+        .toggleStyle(NothingToggle())
+    }
+}
+
+/// Les trois modes de bruit et, sous eux, les quatre niveaux de réduction.
+struct NoiseControls: View {
+    @ObservedObject var headset: Headset
+    @AppStorage("lastNoiseLevel") private var lastLevel = Int(NoiseMode.high.rawValue)
+
+    private var noise: NoiseMode { headset.state.noise ?? .off }
+
+    var body: some View {
+        VStack(spacing: 12) {
+            HStack(spacing: 0) {
+                ModeButton(symbol: "ear.badge.waveform", label: "Réduction", isOn: noise.isCancelling) {
+                    if !noise.isCancelling { headset.setNoise(NoiseMode(rawValue: UInt8(lastLevel)) ?? .high) }
+                }
+                ModeButton(symbol: "person.wave.2", label: "Transparence", isOn: noise == .transparency) { headset.setNoise(.transparency) }
+                ModeButton(symbol: "circle.slash", label: "Désactivé", isOn: noise == .off) { headset.setNoise(.off) }
+            }
+            HStack(spacing: 4) {
+                ForEach(NoiseMode.levels, id: \.self) { level in
+                    Button { headset.setNoise(level) } label: {
+                        VStack(spacing: 6) {
+                            Capsule().fill(noise == level ? Color.nText : Color.nTrack).frame(height: 3)
+                            Text(tr(level.levelLabel)).font(.system(size: 10, weight: noise == level ? .semibold : .regular))
+                                .foregroundStyle(noise == level ? Color.nText : Color.nMuted)
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain).accessibilityAddTraits(noise == level ? .isSelected : [])
+                }
+            }
+            .opacity(noise.isCancelling ? 1 : 0.45)
+        }
+        .onChange(of: noise, initial: true) { _, mode in if mode.isCancelling { lastLevel = Int(mode.rawValue) } }
+    }
 }

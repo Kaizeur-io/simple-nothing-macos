@@ -42,11 +42,11 @@ struct EqualizerShape: View {
                 var turned = context
                 turned.translateBy(x: labels[axis].at.x * unit, y: labels[axis].at.y * unit)
                 turned.rotate(by: .degrees(labels[axis].turn))
-                turned.draw(Text(Self.axes[axis].label.uppercased()).font(.nMono(8 * unit)).tracking(1.2 * unit).foregroundStyle(Color.nMuted), at: .zero)
+                turned.draw(Text(tr(Self.axes[axis].label).uppercased()).font(.nMono(8 * unit)).tracking(1.2 * unit).foregroundStyle(Color.nMuted), at: .zero)
             }
         }
         .aspectRatio(1, contentMode: .fit)
         .animation(.easeInOut(duration: 0.35), value: preset)
-        .accessibilityLabel("Courbe d'égalisation : \(preset.label)")
+        .accessibilityLabel(tr("Courbe d'égalisation : %@", tr(preset.label)))
     }
 }

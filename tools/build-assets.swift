@@ -213,3 +213,11 @@ for (key, item) in best.sorted(by: { $0.key < $1.key }) {
         print("  sujet introuvable : \(key)")
     }
 }
+
+// Polices de Nothing, si vous en avez placé dans originaux/polices/ : la maquette s'en sert, sinon elle s'en passe.
+let fontsDir = "\(root)/originaux/polices"
+for file in (try? fm.contentsOfDirectory(atPath: fontsDir))?.filter({ $0.hasSuffix(".otf") }) ?? [] {
+    try? fm.createDirectory(atPath: "\(outDir)/fonts", withIntermediateDirectories: true)
+    try? fm.removeItem(atPath: "\(outDir)/fonts/\(file)")
+    try? fm.copyItem(atPath: "\(fontsDir)/\(file)", toPath: "\(outDir)/fonts/\(file)")
+}

@@ -32,7 +32,7 @@ struct ContentView: View {
         HStack(spacing: 2) {
             ForEach(Pane.allCases, id: \.self) { item in
                 Button { section = item } label: {
-                    Text(item.label).font(.system(size: 12, weight: section == item ? .semibold : .regular))
+                    Text(tr(item.label)).font(.system(size: 12, weight: section == item ? .semibold : .regular))
                         .foregroundStyle(section == item ? Color.nOnText : Color.nText)
                         .padding(.horizontal, 14).frame(height: 28)
                         .background(section == item ? Color.nText : .clear, in: Capsule()).contentShape(Capsule())

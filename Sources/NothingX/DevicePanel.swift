@@ -12,7 +12,10 @@ enum Finish: String, CaseIterable {
     private var green: Double { self == .darkGrey ? 0.18 : self == .lightGrey ? 0.84 : 0.82 }
     private var blue: Double { self == .darkGrey ? 0.21 : self == .lightGrey ? 0.83 : 0.78 }
 
+    /// Vue de trois quarts, pour la fenêtre.
     var image: NSImage? { Bundle.main.image(forResource: "cmf-headphone-pro-\(rawValue)") }
+    /// Vue de face, plus lisible en petit.
+    var frontImage: NSImage? { Bundle.main.image(forResource: "cmf-headphone-pro-front-\(rawValue)") ?? image }
 }
 
 struct DevicePanel: View {
@@ -26,7 +29,7 @@ struct DevicePanel: View {
             Spacer(minLength: 34)
             hero.frame(maxHeight: 250).padding(.horizontal, 26).opacity(connected ? 1 : 0.35)
             Spacer(minLength: 16)
-            Text(headset.name.isEmpty ? "Aucun appareil" : headset.name).font(.nSerif(23)).foregroundStyle(Color.nText)
+            Text(headset.name.isEmpty ? tr("Aucun appareil") : headset.name).font(.nSerif(23)).foregroundStyle(Color.nText)
                 .lineLimit(1).minimumScaleFactor(0.7).padding(.horizontal, 14)
             battery.padding(.top, 12).frame(height: 40, alignment: .top)
             Spacer(minLength: 10)
@@ -52,11 +55,11 @@ struct DevicePanel: View {
                     .overlay(alignment: .leading) {
                         Capsule().fill(level.percent <= 15 ? Color.nRed : Color.nText).frame(width: 44 * Double(level.percent) / 100)
                     }
-                Text("\(level.percent) %\(level.charging ? " · en charge" : "")").font(.nMono(11)).foregroundStyle(Color.nText)
+                Text(tr("%d %%", level.percent) + (level.charging ? " · " + tr("en charge") : "")).font(.nMono(11)).foregroundStyle(Color.nText)
             }
-            .accessibilityElement(children: .ignore).accessibilityLabel("Batterie \(level.percent) %")
+            .accessibilityElement(children: .ignore).accessibilityLabel(tr("Batterie %d %%", level.percent))
         } else if !connected {
-            Text(headset.status == .connecting ? "Connexion…" : "Allumez votre appareil et reliez-le\nau Mac dans Réglages › Bluetooth.")
+            Text(tr(headset.status == .connecting ? "Connexion en cours…" : "Allumez votre appareil et reliez-le\nau Mac dans Réglages › Bluetooth."))
                 .font(.system(size: 11)).foregroundStyle(Color.nMuted).multilineTextAlignment(.center)
         }
     }
@@ -64,7 +67,7 @@ struct DevicePanel: View {
     private var footer: some View {
         HStack(spacing: 6) {
             Circle().fill(connected ? Color.nGreen : Color.nMuted).frame(width: 5, height: 5)
-            Caps(connected ? "Connecté" : headset.status == .connecting ? "Connexion" : "Déconnecté")
+            Caps(connected ? "Connecté" : headset.status == .connecting ? "Connexion en cours" : "Déconnecté")
             Spacer()
             if connected { Caps([headset.state.codec?.name, headset.state.firmware].compactMap { $0 }.joined(separator: " · ")) }
         }

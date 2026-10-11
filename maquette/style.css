@@ -1,6 +1,12 @@
 /* Nothing X pour Mac — maquette
    Jetons relevés sur les captures de l'app mobile (mode jour) ; le mode nuit en est dérivé. */
 
+/* Polices de Nothing : utilisées si elles ont été copiées dans assets/fonts/ (hors dépôt),
+   sinon les polices de remplacement prennent le relais. La plage de graisses évite le faux gras. */
+@font-face { font-family: "N Headline"; src: url(assets/fonts/NType82-Headline.otf); font-weight: 100 900; }
+@font-face { font-family: "N Mono"; src: url(assets/fonts/LetteraMono-LL.otf); font-weight: 100 900; }
+@font-face { font-family: "N Dot"; src: url(assets/fonts/NDot-55.otf); font-weight: 100 900; }
+
 :root {
   --bg: #F0F0F0;
   --surface: #FFFFFF;
@@ -21,10 +27,10 @@
   --win-edge: rgba(0, 0, 0, .16);
   --bar: rgba(255, 255, 255, .62);
 
-  --serif: "Old Standard TT", "Bodoni 72", Didot, Georgia, serif;
+  --serif: "N Headline", "Old Standard TT", "Bodoni 72", Didot, Georgia, serif;
   --sans: Inter, -apple-system, "Helvetica Neue", sans-serif;
-  --mono: "DM Mono", "SF Mono", Menlo, monospace;
-  --dot: Doto, "DM Mono", monospace;
+  --mono: "N Mono", "DM Mono", "SF Mono", Menlo, monospace;
+  --dot: "N Dot", Doto, "DM Mono", monospace;
 }
 
 [data-theme="dark"] {

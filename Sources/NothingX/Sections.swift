@@ -18,8 +18,6 @@ enum Pane: String, CaseIterable {
 
 struct ListenSection: View {
     @ObservedObject var headset: Headset
-    @AppStorage("lastNoiseLevel") private var lastLevel = Int(NoiseMode.high.rawValue)
-
     private var noise: NoiseMode { headset.state.noise ?? .off }
     private var preset: Preset { headset.state.preset ?? .pop }
     private var spatial: SpatialMode { headset.state.spatial ?? .off }
@@ -39,17 +37,9 @@ struct ListenSection: View {
                         .frame(maxHeight: .infinity)
                 }
                 Card(padding: 0) {
-                    Toggle(isOn: Binding(get: { headset.state.lowLatency ?? false }, set: headset.setLowLatency)) {
-                        HStack(spacing: 12) {
-                            Image(systemName: "timer").font(.system(size: 14)).foregroundStyle(Color.nText).frame(width: 22)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Mode de faible latence").font(.system(size: 13)).foregroundStyle(Color.nText)
-                                Text(headset.state.lowLatency == true ? "Activé" : "Désactivé").font(.system(size: 11)).foregroundStyle(Color.nMuted)
-                            }
-                            Spacer()
-                        }
-                    }
-                    .toggleStyle(NothingToggle()).padding(.horizontal, 16).frame(maxHeight: .infinity)
+                    ToggleRow(symbol: "timer", title: "Mode de faible latence", subtitle: headset.state.lowLatency == true ? "Activé" : "Désactivé",
+                              isOn: headset.state.lowLatency ?? false, set: headset.setLowLatency)
+                        .padding(.horizontal, 16).frame(maxHeight: .infinity)
                 }
             }
             .frame(height: 62)
@@ -60,33 +50,9 @@ struct ListenSection: View {
         Card {
             VStack(alignment: .leading, spacing: 12) {
                 CardHead(title: "Réduction du bruit", subtitle: noise.summary)
-                HStack(spacing: 0) {
-                    ModeButton(symbol: "ear.badge.waveform", label: "Réduction", isOn: noise.isCancelling) {
-                        if !noise.isCancelling { headset.setNoise(NoiseMode(rawValue: UInt8(lastLevel)) ?? .high) }
-                    }
-                    ModeButton(symbol: "person.wave.2", label: "Transparence", isOn: noise == .transparency) { headset.setNoise(.transparency) }
-                    ModeButton(symbol: "circle.slash", label: "Désactivé", isOn: noise == .off) { headset.setNoise(.off) }
-                }
-                HStack(spacing: 4) {
-                    ForEach(NoiseMode.levels, id: \.self) { level in
-                        Button {
-                            lastLevel = Int(level.rawValue)
-                            headset.setNoise(level)
-                        } label: {
-                            VStack(spacing: 6) {
-                                Capsule().fill(noise == level ? Color.nText : Color.nTrack).frame(height: 3)
-                                Text(level.levelLabel).font(.system(size: 10, weight: noise == level ? .semibold : .regular))
-                                    .foregroundStyle(noise == level ? Color.nText : Color.nMuted)
-                            }
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain).accessibilityAddTraits(noise == level ? .isSelected : [])
-                    }
-                }
-                .opacity(noise.isCancelling ? 1 : 0.45)
+                NoiseControls(headset: headset)
             }
         }
-        .onChange(of: noise) { _, mode in if mode.isCancelling { lastLevel = Int(mode.rawValue) } }
     }
 
     private var spatialCard: some View {
@@ -153,18 +119,11 @@ struct ControlsSection: View {
 
     @ViewBuilder private func menu(_ control: ButtonMapping.Control) -> some View {
         if let gesture = headset.state.gesture(control) {
-            Menu {
-                ForEach(control.actions, id: \.code) { action in
-                    Button(action.label) {
-                        // Le contrôle du bruit a plusieurs codes selon les modes parcourus : on garde celui en place.
-                        let both = ButtonMapping.Action.noiseControlAll
-                        if !(both.contains(action.code) && both.contains(gesture.action)) { headset.setAction(action.code, for: control) }
-                    }
-                }
-            } label: {
-                Text(control.label(for: gesture.action)).font(.system(size: 12))
-            }
-            .menuStyle(.borderlessButton).fixedSize()
+            // Le contrôle du bruit a plusieurs codes selon les modes parcourus : on garde celui en place.
+            let noiseCodes = ButtonMapping.Action.noiseControlAll
+            ValueMenu(value: control.label(for: gesture.action), options: control.actions.map { action in
+                (action.label, { if !(noiseCodes.contains(action.code) && noiseCodes.contains(gesture.action)) { headset.setAction(action.code, for: control) } })
+            })
         } else {
             Text("–").foregroundStyle(Color.nMuted)
         }
@@ -180,17 +139,9 @@ struct LinkSection: View {
         VStack(alignment: .leading, spacing: 8) {
             SectionTitle("Double connexion")
             RowGroup {
-                Toggle(isOn: Binding(get: { headset.state.dualConnection ?? false }, set: headset.setDualConnection)) {
-                    HStack(spacing: 12) {
-                        Image(systemName: "square.2.layers.3d").font(.system(size: 14)).foregroundStyle(Color.nText).frame(width: 22)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Double connexion").font(.system(size: 13)).foregroundStyle(Color.nText)
-                            Text("Reste relié à deux appareils à la fois").font(.system(size: 11)).foregroundStyle(Color.nMuted)
-                        }
-                        Spacer()
-                    }
-                }
-                .toggleStyle(NothingToggle()).padding(.horizontal, 16).frame(minHeight: 48)
+                ToggleRow(symbol: "square.2.layers.3d", title: "Double connexion", subtitle: "Reste relié à deux appareils à la fois",
+                          isOn: headset.state.dualConnection ?? false, set: headset.setDualConnection)
+                    .padding(.horizontal, 16).frame(minHeight: 48)
             }
             SectionTitle("Qualité audio")
             RowGroup {
@@ -223,7 +174,7 @@ struct DeviceSection: View {
                                         .overlay { Circle().strokeBorder(Color.nTrack, lineWidth: 1) }
                                         .padding(3).overlay { Circle().strokeBorder(finish == item ? Color.nText : .clear, lineWidth: 1.5) }
                                 }
-                                .buttonStyle(.plain).accessibilityLabel(item.label).accessibilityAddTraits(finish == item ? .isSelected : [])
+                                .buttonStyle(.plain).accessibilityLabel(tr(item.label)).accessibilityAddTraits(finish == item ? .isSelected : [])
                             }
                         }
                     }
@@ -233,7 +184,7 @@ struct DeviceSection: View {
                 Row(title: "Firmware") { value(headset.state.firmware ?? "–") }
             }
             if let model = headset.model, !model.verified {
-                Text("Ce modèle n'a pas encore été vérifié : certains réglages peuvent manquer.")
+                Text(tr("Ce modèle n'a pas encore été vérifié : certains réglages peuvent manquer."))
                     .font(.system(size: 11)).foregroundStyle(Color.nMuted).padding(.leading, 4)
             }
             Spacer(minLength: 0)

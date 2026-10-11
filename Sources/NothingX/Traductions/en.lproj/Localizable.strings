@@ -1,0 +1,103 @@
+/* Anglais. Les clés sont les textes français de l'app ; l'orthographe est britannique, comme chez Nothing. */
+
+/* Sections */
+"Écoute" = "Listen";
+"Commandes" = "Controls";
+"Connexion" = "Connection";
+"Appareil" = "Device";
+"Présentation" = "View";
+
+/* Panneau de l'appareil */
+"Aucun appareil" = "No device";
+"Connecté" = "Connected";
+"Connexion en cours" = "Connecting";
+"Connexion en cours…" = "Connecting…";
+"Déconnecté" = "Disconnected";
+"Allumez votre appareil et reliez-le\nau Mac dans Réglages › Bluetooth." = "Turn your device on and connect it\nto this Mac in Settings › Bluetooth.";
+"Allumez votre appareil et reliez-le au Mac dans Réglages › Bluetooth." = "Turn your device on and connect it to this Mac in Settings › Bluetooth.";
+"Réglages Bluetooth" = "Bluetooth settings";
+"%d %%" = "%d%%";
+"Batterie %d %%" = "Battery %d%%";
+"en charge" = "charging";
+
+/* Réduction du bruit */
+"Réduction du bruit" = "Noise control";
+"Réduction" = "Cancellation";
+"Transparence" = "Transparency";
+"Désactivé" = "Off";
+"Désactivée" = "Off";
+"Activé" = "On";
+"Activée · %@" = "On · %@";
+"Mode transparence" = "Transparency mode";
+"Bas" = "Low";
+"Moyen" = "Mid";
+"Haut" = "High";
+"Adaptatif" = "Adaptive";
+
+/* Audio spatial */
+"Audio spatial" = "Spatial audio";
+"Théâtre" = "Cinema";
+"Mode concert" = "Concert mode";
+"Mode théâtre" = "Cinema mode";
+"Mode fixe" = "Fixed";
+"Suivi de tête" = "Head tracking";
+"Mode jeu" = "Game mode";
+
+/* Égaliseur */
+"Égaliseur" = "Equaliser";
+"Électronique" = "Electronic";
+"Améliorer les voix" = "Enhance vocals";
+"Classique" = "Classical";
+"Personnalisé" = "Custom";
+"Électro" = "Electro";
+"Voix" = "Vocals";
+"Perso" = "Custom";
+"Personnalisé · courbe réglée dans l'app mobile" = "Custom · curve set in the mobile app";
+"Médiums" = "Mid";
+"Graves" = "Bass";
+"Aigus" = "Treble";
+"Courbe d'égalisation : %@" = "Equaliser curve: %@";
+
+/* Autres réglages d'écoute */
+"Son personnalisé" = "Personal sound";
+"Calibrage depuis l'app mobile" = "Calibrate from the mobile app";
+"Mode de faible latence" = "Low lag mode";
+
+/* Commandes */
+"Bouton" = "Button";
+"Appuyez une fois" = "Press once";
+"Appuyez longuement" = "Press and hold";
+"Curseur d'énergie" = "Energy slider";
+"Curseur" = "Slider";
+"Molette de défilement" = "Roller";
+"Alterne entre les modes de bruit" = "Cycles through noise control modes";
+"Gestes fixes" = "Fixed gestures";
+"1 appui : lecture/pause · 2 : suivant · 3 : précédent · défilement : volume" = "1 press: play/pause · 2: next · 3: previous · scroll: volume";
+"Assistant vocal" = "Voice assistant";
+"Contrôle du bruit" = "Noise control";
+"Micro activé/coupé" = "Mic on/off";
+"Préréglage d'égaliseur" = "Equaliser preset";
+"Aucune action" = "No action";
+"Réglage des basses" = "Bass";
+"Réglage des aigus" = "Treble";
+
+/* Connexion */
+"Double connexion" = "Dual connection";
+"Reste relié à deux appareils à la fois" = "Stays connected to two devices at once";
+"Qualité audio" = "Audio quality";
+"LDAC indisponible : macOS ne le propose pas en Bluetooth" = "LDAC unavailable: macOS does not offer it over Bluetooth";
+
+/* Appareil */
+"Informations" = "Information";
+"Modèle" = "Model";
+"Couleur" = "Colour";
+"N° de série" = "Serial number";
+"Adresse Bluetooth" = "Bluetooth address";
+"Gris foncé" = "Dark grey";
+"Gris clair" = "Light grey";
+"Vert clair" = "Light green";
+"Ce modèle n'a pas encore été vérifié : certains réglages peuvent manquer." = "This model has not been verified yet: some settings may be missing.";
+
+/* Barre des menus */
+"Ouvrir Nothing X" = "Open Nothing X";
+"Quitter" = "Quit";

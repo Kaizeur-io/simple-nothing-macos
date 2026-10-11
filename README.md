@@ -14,6 +14,7 @@ Une application macOS pour régler les casques et écouteurs Nothing et CMF, que
 Sources/
   NothingKit/    le protocole : trames, commandes, état de l'appareil (sans dépendance, testé)
   NothingX/      l'application SwiftUI : liaison Bluetooth, fenêtre, barre des menus
+    Traductions/ l'anglais (les textes de l'app sont écrits en français)
 Tests/           tests de NothingKit, à partir d'octets relevés sur un vrai casque
 maquette/        maquettes HTML/CSS/JS, sans dépendance ni étape de construction
   index.html     V1 : transposition directe de l'app mobile (tuiles et sous-pages)
@@ -22,6 +23,7 @@ maquette/        maquettes HTML/CSS/JS, sans dépendance ni étape de constructi
   planche.html   planche de contrôle des visuels produit
 tools/
   app.sh               compile l'application, l'emballe en .app et la lance
+  make-icon.swift      dessine l'icône de l'application
   build-assets.swift   fabrique les visuels produit à partir de vos propres sources
   probe.swift          sonde Bluetooth en lecture seule
   probe.sh             compile et lance la sonde
@@ -38,7 +40,17 @@ tools/app.sh
 
 macOS demande l'autorisation Bluetooth au premier lancement. Sans appareil sous la main, `tools/app.sh --demo` montre l'app avec un état factice. Les tests se lancent avec `swift test`.
 
+L'app suit la langue du système : français, ou anglais pour toutes les autres langues. Pour forcer l'anglais : `tools/app.sh -AppleLanguages "(en)"`.
+
 Chaque réglage envoyé est suivi d'une relecture : l'écran montre ce que l'appareil a réellement retenu.
+
+### Confirmer les réglages sur un appareil
+
+```sh
+tools/app.sh --verify rapport.txt
+```
+
+L'app modifie tour à tour le mode de bruit, l'égaliseur, l'audio spatial, la faible latence et une commande, relit la réponse de l'appareil, remet chaque valeur d'origine, puis écrit le résultat dans `rapport.txt`. C'est le moyen de savoir ce qui marche sur un modèle qui n'a pas encore été vérifié.
 
 ## Voir les maquettes
 
@@ -48,18 +60,25 @@ python3 -m http.server 4173 --directory maquette
 
 Puis ouvrir `http://localhost:4173/v2.html`. La barre noire en bas de page pilote la maquette (thème, appareil connecté ou non, arrivée d'un nouvel appareil) et permet de passer d'une version à l'autre.
 
-## Images produit
+## Ce qui reste hors du dépôt
 
-Les photos des appareils appartiennent à Nothing : elles ne sont pas dans le dépôt. Tant qu'elles n'ont pas été fabriquées, les maquettes fonctionnent mais sans images. Pour les obtenir, placez vos propres fichiers dans `originaux/` puis lancez le script :
+Les photos des appareils et les polices appartiennent à Nothing (et à Lineto pour Lettera Mono) : elles ne sont pas dans le dépôt. Sans elles tout fonctionne, avec des pictogrammes et des polices de remplacement. Pour retrouver l'aspect d'origine sur votre machine, placez vos propres fichiers dans `originaux/`, que git ignore :
 
-- `originaux/captures/` : captures d'écran de l'app mobile (1280 × 2772, nommées `26725.jpg`… comme attendu par le script) ;
-- `originaux/site/` : images enregistrées depuis le site Nothing.
+| Dossier | Contenu | Utilisé par |
+|---|---|---|
+| `originaux/captures/` | captures d'écran de l'app mobile (1280 × 2772, nommées `26725.jpg`… comme attendu par le script) | maquettes |
+| `originaux/site/` | images enregistrées depuis le site Nothing | maquettes, fenêtre de l'app |
+| `originaux/ear-web/` | `b175_black.webp`, `b175_white.webp`, `b175_green.webp` : le casque vu de face | barre des menus |
+| `originaux/polices/` | `NType82-Headline.otf`, `LetteraMono-LL.otf`, `NDot-55.otf` | maquettes et app |
+| `originaux/icone.png` | une icône carrée de votre choix | app, à la place de l'icône fournie |
+
+Les visuels des maquettes se fabriquent ensuite avec :
 
 ```sh
 mkdir -p .build && swiftc -O tools/build-assets.swift -o .build/build-assets && .build/build-assets
 ```
 
-Le script recadre, détoure et range le tout dans `maquette/assets/`.
+Le script recadre, détoure et range le tout dans `maquette/assets/`. `tools/app.sh` prend de son côté ce dont l'app a besoin à chaque construction.
 
 ## Sonder un appareil
 

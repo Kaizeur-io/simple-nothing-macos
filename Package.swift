@@ -6,7 +6,8 @@ let package = Package(
     platforms: [.macOS(.v14)],
     targets: [
         .target(name: "NothingKit"),
-        .executableTarget(name: "NothingX", dependencies: ["NothingKit"]),
+        // Les traductions sont copiées dans l'app par tools/app.sh, où Bundle.main les trouve.
+        .executableTarget(name: "NothingX", dependencies: ["NothingKit"], exclude: ["Traductions"]),
         .testTarget(name: "NothingKitTests", dependencies: ["NothingKit"]),
     ]
 )

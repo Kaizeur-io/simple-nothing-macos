@@ -31,7 +31,7 @@ public enum Preset: UInt8, CaseIterable, Sendable {
     case dirac = 0, rock = 1, electronic = 2, pop = 3, vocal = 4, classical = 5, custom = 6
 }
 
-public enum SpatialMode: Equatable, Sendable {
+public enum SpatialMode: Hashable, Sendable {
     case off, fixed, headTracked, concert, theatre, game
 
     /// Sur le fil : mode, puis suivi de tête.

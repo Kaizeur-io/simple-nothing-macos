@@ -17,7 +17,7 @@ extension NoiseMode {
         switch self {
         case .off: "Désactivée"
         case .transparency: "Mode transparence"
-        default: "Activée · \(levelLabel)"
+        default: tr("Activée · %@", tr(levelLabel))
         }
     }
 
@@ -34,6 +34,16 @@ extension Preset {
         case .vocal: "Améliorer les voix"
         case .classical: "Classique"
         case .custom: "Personnalisé"
+        }
+    }
+
+    /// Version courte, pour le panneau de la barre des menus.
+    var shortLabel: String {
+        switch self {
+        case .electronic: "Électro"
+        case .vocal: "Voix"
+        case .custom: "Perso"
+        default: label
         }
     }
 
@@ -66,6 +76,17 @@ extension SpatialMode {
     }
 }
 
+extension SpatialMode {
+    var shortLabel: String {
+        switch self {
+        case .off: "Désactivé"
+        case .concert: "Concert"
+        case .theatre: "Théâtre"
+        default: summary
+        }
+    }
+}
+
 extension ButtonMapping.Control {
     /// Actions proposées par l'app mobile pour cette commande.
     var actions: [(label: String, code: UInt8)] {
@@ -83,6 +104,6 @@ extension ButtonMapping.Control {
 
     func label(for code: UInt8) -> String {
         if ButtonMapping.Action.noiseControlAll.contains(code) { return "Contrôle du bruit" }
-        return actions.first { $0.code == code }?.label ?? String(format: "Action 0x%02X", code)
+        return actions.first { $0.code == code }?.label ?? String(format: "0x%02X", code)
     }
 }

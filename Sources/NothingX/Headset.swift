@@ -13,6 +13,9 @@ final class Headset: NSObject, ObservableObject {
 
     var model: Model? { Model.named(name) }
 
+    /// Toutes les trames reçues, pour le diagnostic.
+    var onFrame: ((Frame) -> Void)?
+
     private var link: Link?
     private var connectWatch: IOBluetoothUserNotification?
     private var disconnectWatch: IOBluetoothUserNotification?
@@ -83,7 +86,10 @@ final class Headset: NSObject, ObservableObject {
             self?.status = .connected
             Read.allCases.forEach { link.send($0.rawValue) }
         }
-        link.onFrame = { [weak self] frame in self?.state.apply(frame) }
+        link.onFrame = { [weak self] frame in
+            self?.state.apply(frame)
+            self?.onFrame?(frame)
+        }
         link.onClose = { [weak self] in self?.detach(retry: device.isConnected()) }
         guard link.open() else { return }
         self.link = link
