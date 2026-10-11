@@ -22,7 +22,9 @@ maquette/        maquettes HTML/CSS/JS, sans dépendance ni étape de constructi
   shared.js      icônes, données et briques communes aux deux
   planche.html   planche de contrôle des visuels produit
 tools/
-  app.sh               compile l'application, l'emballe en .app et la lance
+  build-app.sh         compile l'application et l'emballe en .app
+  app.sh               la construit et la lance depuis le projet
+  install.sh           la construit et l'installe dans /Applications
   make-icon.swift      dessine l'icône de l'application
   build-assets.swift   fabrique les visuels produit à partir de vos propres sources
   probe.swift          sonde Bluetooth en lecture seule
@@ -37,6 +39,14 @@ Il suffit des outils en ligne de commande d'Apple (`xcode-select --install`), Xc
 ```sh
 tools/app.sh
 ```
+
+Pour s'en servir au quotidien, mieux vaut l'installer :
+
+```sh
+tools/install.sh
+```
+
+L'app vit dans la barre des menus : fermer la fenêtre ne la quitte pas, et elle ne garde une icône dans le Dock que tant que la fenêtre est ouverte. Avec « Ouvrir au démarrage du Mac » (onglet Appareil), elle est là dès l'ouverture de session et annonce l'appareil quand il se connecte. Ce réglage demande que l'app soit dans `/Applications`.
 
 macOS demande l'autorisation Bluetooth au premier lancement. Sans appareil sous la main, `tools/app.sh --demo` montre l'app avec un état factice. Les tests se lancent avec `swift test`.
 
@@ -93,8 +103,9 @@ La sonde n'envoie que des lectures. macOS demande l'autorisation Bluetooth au pr
 ## Suite prévue
 
 1. Confirmer les écritures restantes (double connexion, renfort des basses).
-2. Compléter l'application : ouverture au démarrage du Mac, choix du raccourci, appairage d'un appareil jamais relié.
-3. Étendre aux autres modèles, dont les capacités diffèrent.
+2. Compléter l'application : choix du raccourci, appairage d'un appareil jamais relié au Mac.
+3. Distribution : une archive téléchargeable, signée et notarisée, pour installer sans compiler.
+4. Étendre aux autres modèles, dont les capacités diffèrent.
 
 ## Projets voisins
 

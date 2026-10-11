@@ -6,7 +6,6 @@ import SwiftUI
 struct MenuBarPanel: View {
     @ObservedObject var headset: Headset
     @AppStorage("finish") private var finish = Finish.darkGrey
-    @Environment(\.openWindow) private var openWindow
 
     private var connected: Bool { headset.status == .connected }
     private var state: DeviceState { headset.state }
@@ -60,10 +59,7 @@ struct MenuBarPanel: View {
             }
             rule
             HStack {
-                Button {
-                    openWindow(id: "main")
-                    NSApp.activate(ignoringOtherApps: true)
-                } label: {
+                Button { AppDelegate.showMainWindow() } label: {
                     HStack(spacing: 6) {
                         Text(tr("Ouvrir Nothing X")).font(.system(size: 12, weight: .medium))
                         Image(systemName: "arrow.up.right").font(.system(size: 9, weight: .semibold))

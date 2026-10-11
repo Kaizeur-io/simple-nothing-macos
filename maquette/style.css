@@ -3,7 +3,7 @@
 
 /* Polices de Nothing : utilisées si elles ont été copiées dans assets/fonts/ (hors dépôt),
    sinon les polices de remplacement prennent le relais. La plage de graisses évite le faux gras. */
-@font-face { font-family: "N Headline"; src: url(assets/fonts/NType82-Headline.otf); font-weight: 100 900; }
+@font-face { font-family: "N Headline"; src: url(assets/fonts/NType82-Regular.otf); font-weight: 100 900; }
 @font-face { font-family: "N Mono"; src: url(assets/fonts/LetteraMono-LL.otf); font-weight: 100 900; }
 @font-face { font-family: "N Dot"; src: url(assets/fonts/NDot-55.otf); font-weight: 100 900; }
 

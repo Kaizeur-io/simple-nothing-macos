@@ -95,6 +95,9 @@
 
 /* Appareil */
 "Application" = "App";
+"Ouvrir au démarrage du Mac" = "Open at login";
+"Reste dans la barre des menus, sans fenêtre" = "Stays in the menu bar, without a window";
+"Refusé par macOS : installez d'abord l'app dans Applications" = "Refused by macOS: install the app in Applications first";
 "Changer de mode de bruit au clavier" = "Switch noise mode from the keyboard";
 "Raccourci ⌃⌥A, actif dans toutes les apps" = "Shortcut ⌃⌥A, works in every app";
 "Carte à la connexion" = "Connection card";

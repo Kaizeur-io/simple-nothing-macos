@@ -33,7 +33,8 @@ enum Typeface {
 
     private static func available(_ name: String) -> String? { NSFont(name: name, size: 12) == nil ? nil : name }
 
-    static let headline = available("NType82-Headline")
+    /// La graisse normale, comme dans l'app mobile ; « Headline » est plus grasse et plus serrée.
+    static let headline = available("NType82-Regular")
     static let mono = available("LetteraMonoLL-Regular")
     static let dot = available("Ndot-55")
 }

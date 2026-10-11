@@ -1,4 +1,6 @@
 import AppKit
+import Carbon.HIToolbox
+import ServiceManagement
 import SwiftUI
 
 /// Options de lancement, pour les captures d'écran et les essais sans casque :
@@ -34,9 +36,38 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     static var openMain: (() -> Void)?
     private static var hotKey: HotKey?
 
+    static var mainWindow: NSWindow? { NSApp.windows.first { $0.frame.width > 600 && $0.contentView != nil && !($0 is NSPanel) } }
+
+    /// L'app vit dans la barre des menus : elle n'occupe le Dock que tant que sa fenêtre est ouverte.
     static func showMainWindow() {
+        NSApp.setActivationPolicy(.regular)
         openMain?()
         NSApp.activate(ignoringOtherApps: true)
+    }
+
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows: Bool) -> Bool {
+        if !hasVisibleWindows { Self.showMainWindow() }
+        return true
+    }
+
+    @objc private func windowWillClose(_ notification: Notification) {
+        guard let window = notification.object as? NSWindow, window === Self.mainWindow else { return }
+        NSApp.setActivationPolicy(.accessory)
+    }
+
+    /// Ouverture au démarrage du Mac. Renvoie faux si macOS refuse, par exemple hors de /Applications.
+    static var opensAtLogin: Bool { SMAppService.mainApp.status == .enabled }
+
+    @discardableResult
+    static func setOpensAtLogin(_ on: Bool) -> Bool {
+        do {
+            if on { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
+            return true
+        } catch {
+            return false
+        }
     }
 
     /// Met le raccourci global en accord avec le réglage : ⌃⌥A passe au mode de bruit suivant.
@@ -53,7 +84,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if Launch.arguments.contains("--light") { NSApp.appearance = NSAppearance(named: .aqua) }
         UserDefaults.standard.register(defaults: ["shortcutEnabled": true, "arrivalCard": true])
         Self.headset.onArrival = {
-            if UserDefaults.standard.bool(forKey: "arrivalCard") { HUD.shared.show(ArrivalCard(headset: Self.headset), seconds: 4.5) }
+            // Fenêtre déjà sous les yeux : elle montre la même chose, la carte ferait doublon.
+            let windowInFront = NSApp.isActive && Self.mainWindow?.isVisible == true
+            if UserDefaults.standard.bool(forKey: "arrivalCard"), !windowInFront { HUD.shared.show(ArrivalCard(headset: Self.headset), seconds: 4.5) }
+        }
+        NotificationCenter.default.addObserver(self, selector: #selector(windowWillClose(_:)), name: NSWindow.willCloseNotification, object: nil)
+        // Lancée par macOS à l'ouverture de session : pas de fenêtre, seulement la barre des menus.
+        let event = NSAppleEventManager.shared().currentAppleEvent
+        if event?.eventID == AEEventID(kAEOpenApplication), event?.paramDescriptor(forKeyword: AEKeyword(keyAEPropData))?.enumCodeValue == AEKeyword(keyAELaunchedAsLogInItem) {
+            DispatchQueue.main.async { Self.mainWindow?.close() }
         }
         Self.applyShortcut()
         Self.headset.start()

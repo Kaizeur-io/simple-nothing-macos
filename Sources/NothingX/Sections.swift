@@ -182,6 +182,8 @@ struct DeviceSection: View {
     @AppStorage("finish") private var finish = Finish.darkGrey
     @AppStorage("shortcutEnabled") private var shortcutEnabled = true
     @AppStorage("arrivalCard") private var arrivalCard = true
+    @State private var opensAtLogin = AppDelegate.opensAtLogin
+    @State private var loginRefused = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -208,6 +210,13 @@ struct DeviceSection: View {
             }
             SectionTitle("Application")
             RowGroup {
+                ToggleRow(symbol: "power", title: "Ouvrir au démarrage du Mac",
+                          subtitle: loginRefused ? "Refusé par macOS : installez d'abord l'app dans Applications" : "Reste dans la barre des menus, sans fenêtre",
+                          isOn: opensAtLogin) { wanted in
+                    loginRefused = !AppDelegate.setOpensAtLogin(wanted)
+                    opensAtLogin = AppDelegate.opensAtLogin
+                }
+                .padding(.horizontal, 16).frame(minHeight: 48)
                 ToggleRow(symbol: "keyboard", title: "Changer de mode de bruit au clavier", subtitle: "Raccourci ⌃⌥A, actif dans toutes les apps",
                           isOn: shortcutEnabled) { shortcutEnabled = $0; AppDelegate.applyShortcut() }
                     .padding(.horizontal, 16).frame(minHeight: 48)
