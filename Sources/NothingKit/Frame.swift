@@ -36,6 +36,9 @@ public func crc16(_ bytes: [UInt8]) -> UInt16 {
 /// Reconstitue les trames à partir des morceaux reçus, qui ne tombent pas forcément sur leurs limites.
 public struct FrameParser: Sendable {
     private var buffer: [UInt8] = []
+    /// Aucune trame connue ne dépasse quelques centaines d'octets. Au-delà, c'est un faux départ :
+    /// sans cette limite, un octet corrompu ferait attendre des données qui n'arriveront jamais.
+    private static let longest = 2048
 
     public init() {}
 
@@ -48,6 +51,10 @@ public struct FrameParser: Sendable {
             let hasCRC = buffer[1] & 0x20 != 0
             let length = Int(buffer[5]) | Int(buffer[6]) << 8
             let total = 8 + length + (hasCRC ? 2 : 0)
+            guard length <= Self.longest else {
+                buffer.removeFirst()
+                continue
+            }
             guard buffer.count >= total else { return frames }
             if hasCRC {
                 let crc = crc16(Array(buffer[..<(8 + length)]))

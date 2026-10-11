@@ -25,6 +25,7 @@ tools/
   build-app.sh         compile l'application et l'emballe en .app
   app.sh               la construit et la lance depuis le projet
   install.sh           la construit et l'installe dans /Applications
+  release.sh           fabrique l'archive à diffuser, sans image ni police de Nothing
   make-icon.swift      dessine l'icône de l'application
   build-assets.swift   fabrique les visuels produit à partir de vos propres sources
   probe.swift          sonde Bluetooth en lecture seule
@@ -61,6 +62,22 @@ tools/app.sh --verify rapport.txt
 ```
 
 L'app modifie tour à tour le mode de bruit, l'égaliseur, l'audio spatial, la faible latence, une commande et la courbe personnalisée, relit la réponse de l'appareil, remet chaque valeur d'origine, puis écrit le résultat dans `rapport.txt` (ignoré par git : il contient les trames brutes). C'est le moyen de savoir ce qui marche sur un modèle qui n'a pas encore été vérifié.
+
+### Diffuser l'app
+
+```sh
+tools/release.sh
+```
+
+produit `.build/NothingX-<version>.zip` : l'app seule, avec ses pictogrammes et les polices du système, prête à joindre à une version GitHub. L'utilisateur la dézippe, la glisse dans Applications et la lance. L'archive n'étant ni signée par un compte développeur Apple ni notarisée, macOS refuse le premier lancement : il faut alors ouvrir Réglages Système › Confidentialité et sécurité et cliquer sur « Ouvrir quand même ».
+
+## Sécurité
+
+- L'app ne fait aucune connexion réseau : ni statistiques, ni mise à jour automatique, ni compte. Elle n'a aucune dépendance tierce.
+- Elle ne demande qu'une autorisation, le Bluetooth, et ne parle qu'aux appareils déjà jumelés au Mac qui déclarent le service Nothing.
+- Ce que l'appareil envoie est traité comme non fiable : longueurs vérifiées, trames trop longues ou incohérentes écartées.
+- Les constructions locales sont signées sans certificat, avec une identité fixée sur l'identifiant de l'app pour que macOS garde l'accord Bluetooth d'une compilation à l'autre. Une app locale qui usurperait cet identifiant hériterait de cet accord : acceptable sur sa propre machine, à remplacer par une vraie signature pour une diffusion large.
+- L'app n'est pas en bac à sable.
 
 ## Voir les maquettes
 

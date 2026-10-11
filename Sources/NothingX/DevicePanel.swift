@@ -13,9 +13,18 @@ enum Finish: String, CaseIterable {
     private var blue: Double { self == .darkGrey ? 0.21 : self == .lightGrey ? 0.83 : 0.78 }
 
     /// Vue de trois quarts, pour la fenêtre.
-    var image: NSImage? { Bundle.main.image(forResource: "cmf-headphone-pro-\(rawValue)") }
+    var image: NSImage? { Self.cached("cmf-headphone-pro-\(rawValue)") }
     /// Vue de face, plus lisible en petit.
-    var frontImage: NSImage? { Bundle.main.image(forResource: "cmf-headphone-pro-front-\(rawValue)") ?? image }
+    var frontImage: NSImage? { Self.cached("cmf-headphone-pro-front-\(rawValue)") ?? image }
+
+    /// Les images sont lues une seule fois : l'écran se redessine à chaque réponse de l'appareil.
+    private static var cache: [String: NSImage?] = [:]
+    private static func cached(_ name: String) -> NSImage? {
+        if let known = cache[name] { return known }
+        let image = Bundle.main.image(forResource: name)
+        cache[name] = image
+        return image
+    }
 }
 
 struct DevicePanel: View {

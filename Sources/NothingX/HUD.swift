@@ -44,7 +44,12 @@ final class HUD {
         NSAnimationContext.runAnimationGroup({ context in
             context.duration = 0.25
             panel.animator().alphaValue = 0
-        }, completionHandler: { panel.orderOut(nil) })
+        }, completionHandler: {
+            // Une nouvelle carte a pu arriver pendant le fondu : dans ce cas on ne touche à rien.
+            guard panel.alphaValue == 0 else { return }
+            panel.orderOut(nil)
+            panel.contentView = nil
+        })
     }
 
     private func makePanel() -> NSPanel {

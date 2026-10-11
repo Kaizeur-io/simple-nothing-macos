@@ -47,6 +47,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 
+    func applicationWillTerminate(_ notification: Notification) { Self.headset.stop() }
+
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows: Bool) -> Bool {
         if !hasVisibleWindows { Self.showMainWindow() }
         return true
@@ -91,8 +93,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NotificationCenter.default.addObserver(self, selector: #selector(windowWillClose(_:)), name: NSWindow.willCloseNotification, object: nil)
         // Lancée par macOS à l'ouverture de session : pas de fenêtre, seulement la barre des menus.
         let event = NSAppleEventManager.shared().currentAppleEvent
-        if event?.eventID == AEEventID(kAEOpenApplication), event?.paramDescriptor(forKeyword: AEKeyword(keyAEPropData))?.enumCodeValue == AEKeyword(keyAELaunchedAsLogInItem) {
-            DispatchQueue.main.async { Self.mainWindow?.close() }
+        let atLogin = event?.eventID == AEEventID(kAEOpenApplication) && event?.paramDescriptor(forKeyword: AEKeyword(keyAEPropData))?.enumCodeValue == AEKeyword(keyAELaunchedAsLogInItem)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            if atLogin {
+                Self.mainWindow?.close()
+            } else if Self.mainWindow == nil {
+                // macOS se souvient d'une fenêtre fermée lors de la session précédente et ne la rouvre pas.
+                // Quelqu'un qui lance l'app veut pourtant la voir.
+                Self.showMainWindow()
+            }
         }
         Self.applyShortcut()
         Self.headset.start()
@@ -143,6 +152,8 @@ struct NothingXApp: App {
     @Environment(\.openWindow) private var openWindow
 
     init() {
+        // L'état des fenêtres n'est pas repris d'une session à l'autre : l'app décide elle-même quoi montrer.
+        UserDefaults.standard.register(defaults: ["NSQuitAlwaysKeepsWindows": false])
         Typeface.register()
         if let name = Launch.value("--section"), Pane(rawValue: name) != nil { UserDefaults.standard.set(name, forKey: "section") }
     }

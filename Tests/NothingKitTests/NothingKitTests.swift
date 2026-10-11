@@ -103,3 +103,10 @@ import Testing
     let again = state.apply(Frame(command: 0x4028, payload: page))
     #expect(!again)  // rien de nouveau : inutile de demander la page suivante
 }
+
+@Test func recoversFromACorruptLength() {
+    var parser = FrameParser()
+    let reply: [UInt8] = [0x55, 0x00, 0x01, 0x07, 0x40, 0x03, 0x00, 0x01, 0x01, 0x06, 0x28]
+    let frames = parser.feed([0x55, 0x00, 0x01, 0x07, 0x40, 0xFF, 0xFF, 0x01] + reply)
+    #expect(frames == [Frame(command: 0x4007, sequence: 1, payload: [0x01, 0x06, 0x28])])
+}

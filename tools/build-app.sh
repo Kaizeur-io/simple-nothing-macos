@@ -14,16 +14,19 @@ cp -R Sources/NothingX/Traductions/*.lproj "$res/"
 
 # Ce qui appartient à Nothing (images, polices) reste hors du dépôt. L'app s'en sert s'il est là,
 # et montre sinon des pictogrammes et des polices du système.
-cp maquette/assets/products/cmf-headphone-pro-*.png "$res/" 2>/dev/null || true
-cp originaux/polices/*.otf "$res/" 2>/dev/null || true
-for pair in black:dark-grey white:light-grey green:light-green; do
-  src="originaux/ear-web/b175_${pair%%:*}.webp"
-  if [ -f "$src" ]; then sips -s format png -Z 480 "$src" --out "$res/cmf-headphone-pro-front-${pair##*:}.png" >/dev/null 2>&1; fi
-done
+# NOTHING_PUBLIC=1 construit la version à diffuser, sans rien de tout cela.
+if [ -z "$NOTHING_PUBLIC" ]; then
+  cp maquette/assets/products/cmf-headphone-pro-*.png "$res/" 2>/dev/null || true
+  cp originaux/polices/*.otf "$res/" 2>/dev/null || true
+  for pair in black:dark-grey white:light-grey green:light-green; do
+    src="originaux/ear-web/b175_${pair%%:*}.webp"
+    if [ -f "$src" ]; then sips -s format png -Z 480 "$src" --out "$res/cmf-headphone-pro-front-${pair##*:}.png" >/dev/null 2>&1; fi
+  done
+fi
 
 # Icône : la vôtre si originaux/icone.png existe, sinon celle que dessine tools/make-icon.swift.
 icon=originaux/icone.png
-if [ ! -f "$icon" ]; then
+if [ ! -f "$icon" ] || [ -n "$NOTHING_PUBLIC" ]; then
   icon=.build/icone.png
   if [ ! -f "$icon" ] || [ tools/make-icon.swift -nt "$icon" ]; then
     swiftc tools/make-icon.swift -o .build/make-icon && .build/make-icon "$icon"

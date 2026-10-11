@@ -18,6 +18,8 @@ final class Link: NSObject, IOBluetoothRFCOMMChannelDelegate {
     private var sequence: UInt8 = 0
     private var pending: [[UInt8]] = []
     private var pacer: Timer?
+    /// Trame en cours d'envoi : sa mémoire doit rester en place jusqu'à la fin de l'écriture.
+    private var inFlight: UnsafeMutablePointer<UInt8>?
 
     init(device: IOBluetoothDevice) { self.device = device }
 
@@ -42,6 +44,7 @@ final class Link: NSObject, IOBluetoothRFCOMMChannelDelegate {
         pacer?.invalidate()
         pacer = nil
         pending.removeAll()
+        // Une écriture peut encore être en cours : sa mémoire est rendue quand elle se termine.
         isOpen = false
         channel?.setDelegate(nil)
         channel?.close()
@@ -49,13 +52,26 @@ final class Link: NSObject, IOBluetoothRFCOMMChannelDelegate {
     }
 
     private func pump() {
-        guard isOpen, pacer == nil, !pending.isEmpty else { return }
-        var packet = pending.removeFirst()
-        _ = channel?.writeSync(&packet, length: UInt16(packet.count))
-        pacer = Timer.scheduledTimer(withTimeInterval: 0.12, repeats: false) { [weak self] _ in
+        guard isOpen, pacer == nil, inFlight == nil, !pending.isEmpty, let channel else { return }
+        let packet = pending.removeFirst()
+        let memory = UnsafeMutablePointer<UInt8>.allocate(capacity: packet.count)
+        memory.initialize(from: packet, count: packet.count)
+        inFlight = memory
+        if channel.writeAsync(memory, length: UInt16(packet.count), refcon: nil) != kIOReturnSuccess { sent() }
+    }
+
+    /// L'écriture est terminée : on laisse à l'appareil le temps de répondre avant la suivante.
+    private func sent() {
+        inFlight?.deallocate()
+        inFlight = nil
+        pacer = Timer.scheduledTimer(withTimeInterval: 0.08, repeats: false) { [weak self] _ in
             self?.pacer = nil
             self?.pump()
         }
+    }
+
+    func rfcommChannelWriteComplete(_ rfcommChannel: IOBluetoothRFCOMMChannel!, refcon: UnsafeMutableRawPointer!, status error: IOReturn) {
+        sent()
     }
 
     func rfcommChannelOpenComplete(_ rfcommChannel: IOBluetoothRFCOMMChannel!, status error: IOReturn) {

@@ -48,6 +48,8 @@ final class Headset: NSObject, ObservableObject {
     private var poll: Timer?
     private var permission: BluetoothPermission?
     private var announceArrival = false
+    /// macOS signale aussi, à l'inscription, les appareils déjà reliés : ceux-là ne sont pas des arrivées.
+    private var watchingArrivals = false
     private var dualPages = 0
     private let isDemo: Bool
 
@@ -66,8 +68,18 @@ final class Headset: NSObject, ObservableObject {
             guard allowed else { return self.status = .unauthorized }
             self.connectWatch = IOBluetoothDevice.register(forConnectNotifications: self, selector: #selector(self.deviceConnected(_:device:)))
             self.attach()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in self?.watchingArrivals = true }
             self.poll = Timer.scheduledTimer(withTimeInterval: 120, repeats: true) { [weak self] _ in self?.link?.send(Read.battery.rawValue) }
         }
+    }
+
+    /// À la fermeture de l'app : on rend le canal au lieu de laisser macOS constater sa disparition.
+    func stop() {
+        poll?.invalidate()
+        connectWatch?.unregister()
+        disconnectWatch?.unregister()
+        link?.close()
+        link = nil
     }
 
     // MARK: Réglages
@@ -151,7 +163,10 @@ final class Headset: NSObject, ObservableObject {
     }
 
     private func receive(_ frame: Frame) {
-        let news = state.apply(frame)
+        // On ne publie que ce qui change : une réponse identique ne redessine rien.
+        var next = state
+        let news = next.apply(frame)
+        if next != state { state = next }
         onFrame?(frame)
         if frame.command == Query.dualDevices & 0x7FFF, news, dualPages < 20 {
             // La liste arrive par pages : tant qu'il y a du nouveau, on demande la suite.
@@ -183,7 +198,7 @@ final class Headset: NSObject, ObservableObject {
 
     @objc private func deviceConnected(_ notification: IOBluetoothUserNotification, device: IOBluetoothDevice) {
         // L'appareil met un instant à ouvrir son service après la connexion audio.
-        if link == nil { announceArrival = true }
+        if link == nil, watchingArrivals { announceArrival = true }
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in self?.attach() }
     }
 
