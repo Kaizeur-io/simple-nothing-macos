@@ -12,6 +12,8 @@ public struct DeviceState: Equatable, Sendable {
     public var dualConnection: Bool?
     public var codec: Codec?
     public var soundProfile: Bool?
+    public var customEQ: CustomEQ?
+    public var dualDevices: [DualDevice] = []
 
     public init() {}
 
@@ -70,9 +72,37 @@ public struct DeviceState: Equatable, Sendable {
         case Read.soundProfile.reply:
             guard let byte = data.first else { return false }
             soundProfile = byte == 1
+        case Read.customEQ.reply:
+            customEQ = CustomEQ(payload: data)
+        case Query.dualDevices & 0x7FFF:
+            return addDualDevices(data)
         default:
             return false
         }
         return true
+    }
+
+    /// Une page de la liste : deux octets d'en-tête, le nombre d'appareils, puis pour chacun un octet
+    /// d'état, six d'adresse, la longueur du nom et le nom. Renvoie vrai s'il y avait du nouveau,
+    /// auquel cas il faut demander la page suivante.
+    private mutating func addDualDevices(_ data: [UInt8]) -> Bool {
+        guard data.count > 2 else { return false }
+        var offset = 3, added = false
+        for _ in 0..<Int(data[2]) {
+            guard offset + 8 <= data.count else { break }
+            let length = Int(data[offset + 7] & 0x7F)
+            guard offset + 8 + length <= data.count else { break }
+            let device = DualDevice(address: data[(offset + 1)...(offset + 6)].map { ($0 < 16 ? "0" : "") + String($0, radix: 16, uppercase: true) }.joined(separator: ":"),
+                                    name: String(decoding: data[(offset + 8)..<(offset + 8 + length)], as: UTF8.self),
+                                    isConnected: data[offset] & 0x0F != 0, isSelf: data[offset] & 0xF0 != 0)
+            if let index = dualDevices.firstIndex(where: { $0.address == device.address }) {
+                dualDevices[index] = device
+            } else {
+                dualDevices.append(device)
+                added = true
+            }
+            offset += 8 + length
+        }
+        return added
     }
 }

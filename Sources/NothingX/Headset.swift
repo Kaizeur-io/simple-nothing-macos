@@ -39,12 +39,16 @@ final class Headset: NSObject, ObservableObject {
 
     /// Toutes les trames reçues, pour le diagnostic.
     var onFrame: ((Frame) -> Void)?
+    /// Un appareil vient de se relier au Mac (et non : l'app l'a trouvé déjà là en démarrant).
+    var onArrival: (() -> Void)?
 
     private var link: Link?
     private var connectWatch: IOBluetoothUserNotification?
     private var disconnectWatch: IOBluetoothUserNotification?
     private var poll: Timer?
     private var permission: BluetoothPermission?
+    private var announceArrival = false
+    private var dualPages = 0
     private let isDemo: Bool
 
     init(demo: Bool = false) {
@@ -93,6 +97,21 @@ final class Headset: NSObject, ObservableObject {
         write(.dualConnection, [on ? 0x01 : 0x00], thenRead: .dualConnection)
     }
 
+    func setCustomEQ(_ curve: CustomEQ) {
+        state.customEQ = curve
+        write(.customEQ, curve.payload, thenRead: .customEQ)
+    }
+
+    /// Passe au mode de bruit suivant : réduction, transparence, désactivé. Renvoie le mode choisi.
+    @discardableResult
+    func cycleNoise() -> NoiseMode? {
+        guard status == .connected, let noise = state.noise else { return nil }
+        let last = NoiseMode(rawValue: UInt8(UserDefaults.standard.integer(forKey: "lastNoiseLevel"))) ?? .high
+        let next: NoiseMode = noise.isCancelling ? .transparency : noise == .transparency ? .off : last.isCancelling ? last : .high
+        setNoise(next)
+        return next
+    }
+
     func setAction(_ action: UInt8, for control: ButtonMapping.Control) {
         guard let index = state.gestures.firstIndex(where: { $0.control == control }) else { return }
         state.gestures[index].action = action
@@ -111,16 +130,17 @@ final class Headset: NSObject, ObservableObject {
     private func attach() {
         guard link == nil else { return }
         let paired = (IOBluetoothDevice.pairedDevices() as? [IOBluetoothDevice]) ?? []
-        guard let device = paired.first(where: { $0.isConnected() && $0.getServiceRecord(for: nothingService) != nil }) else { return }
+        guard let device = paired.first(where: { $0.isConnected() && $0.getServiceRecord(for: nothingService) != nil }) else {
+            announceArrival = false
+            return
+        }
         let link = Link(device: device)
         link.onOpen = { [weak self] in
             self?.status = .connected
             Read.allCases.forEach { link.send($0.rawValue) }
+            self?.requestDualDevices()
         }
-        link.onFrame = { [weak self] frame in
-            self?.state.apply(frame)
-            self?.onFrame?(frame)
-        }
+        link.onFrame = { [weak self] frame in self?.receive(frame) }
         link.onClose = { [weak self] in self?.detach(retry: device.isConnected()) }
         guard link.open() else { return }
         self.link = link
@@ -128,6 +148,27 @@ final class Headset: NSObject, ObservableObject {
         address = (device.addressString ?? "").uppercased().replacingOccurrences(of: "-", with: ":")
         status = .connecting
         disconnectWatch = device.register(forDisconnectNotification: self, selector: #selector(deviceDisconnected(_:device:)))
+    }
+
+    private func receive(_ frame: Frame) {
+        let news = state.apply(frame)
+        onFrame?(frame)
+        if frame.command == Query.dualDevices & 0x7FFF, news, dualPages < 20 {
+            // La liste arrive par pages : tant qu'il y a du nouveau, on demande la suite.
+            dualPages += 1
+            link?.send(Query.dualDevices, [UInt8(state.dualDevices.count & 0xFF)])
+        }
+        if frame.command == Push.dualDevice { requestDualDevices() }
+        if announceArrival, state.mainBattery != nil {
+            announceArrival = false
+            onArrival?()
+        }
+    }
+
+    private func requestDualDevices() {
+        state.dualDevices.removeAll()
+        dualPages = 1
+        link?.send(Query.dualDevices, [0])
     }
 
     private func detach(retry: Bool) {
@@ -142,6 +183,7 @@ final class Headset: NSObject, ObservableObject {
 
     @objc private func deviceConnected(_ notification: IOBluetoothUserNotification, device: IOBluetoothDevice) {
         // L'appareil met un instant à ouvrir son service après la connexion audio.
+        if link == nil { announceArrival = true }
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in self?.attach() }
     }
 
@@ -157,9 +199,14 @@ final class Headset: NSObject, ObservableObject {
             (0x4007, [0x01, 0x06, 0x2D]), (0x4042, Array("1.0.1.49".utf8)), (0x4006, [0x01] + Array("6,4,CI0000000000000000".utf8)),
             (0x401E, [0x01, 0x01, 0x00]), (0x4050, [0x03]), (0x404F, [0x02, 0x00]), (0x4041, [0x00]), (0x4027, [0x01]),
             (0x4029, [0x00]), (0x405A, [0x00]),
+            (0x4028, [0x00, 0x00, 0x02, 0x11, 0, 0, 0, 0, 0, 1, 0x0B] + Array("MacBook Pro".utf8) + [0x00, 0, 0, 0, 0, 0, 2, 0x09] + Array("Phone (3)".utf8)),
             (0x4018, [0x04, 0x06, 0x0A, 0x07, 0x01, 0x06, 0x0A, 0x01, 0x0B, 0x06, 0x05, 0x01, 0x23, 0x06, 0x01, 0x07, 0x16]),
         ]
         for (command, payload) in replies { state.apply(Frame(command: command, payload: payload)) }
+        if CommandLine.arguments.contains("--demo-custom") {
+            state.preset = .custom
+            state.customEQ = CustomEQ(mid: 2, bass: -3, treble: 5)
+        }
     }
 }
 

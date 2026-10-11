@@ -76,3 +76,30 @@ import Testing
     #expect(Model.named("Nothing Ear (a)")?.id == "B162")
     #expect(Model.named("AirPods Pro") == nil)
 }
+
+@Test func customEQRoundTrips() {
+    let curve = CustomEQ(mid: 2, bass: -1, treble: 3)
+    let payload = curve.payload
+    #expect(payload.count == 1 + 4 + 3 * 13 + 9)
+    #expect(Array(payload[0..<5]) == [0x03, 0x00, 0x00, 0x40, 0xC0])  // trois filtres, gain d'ensemble de -3 dB
+    #expect(Array(payload[5..<10]) == [0x01, 0x00, 0x00, 0x00, 0x40])  // filtre en cloche, +2 dB
+    #expect(CustomEQ(payload: payload) == curve)
+    #expect(CustomEQ(payload: [UInt8](repeating: 0, count: 109)) == nil)  // ce que renvoie un casque sans courbe
+}
+
+@Test func readsDualConnectionPages() {
+    var state = DeviceState()
+    let mac: [UInt8] = [0x11, 0x22, 0x33, 0x44, 0x55, 0x66]
+    var page: [UInt8] = [0x00, 0x00, 0x02, 0x11]
+    page += mac
+    page += [0x03]
+    page += Array("Mac".utf8)
+    page += [0x00, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x05]
+    page += Array("Phone".utf8)
+    let fresh = state.apply(Frame(command: 0x4028, payload: page))
+    #expect(fresh)
+    #expect(state.dualDevices == [DualDevice(address: "11:22:33:44:55:66", name: "Mac", isConnected: true, isSelf: true),
+                                  DualDevice(address: "AA:BB:CC:DD:EE:FF", name: "Phone", isConnected: false, isSelf: false)])
+    let again = state.apply(Frame(command: 0x4028, payload: page))
+    #expect(!again)  // rien de nouveau : inutile de demander la page suivante
+}

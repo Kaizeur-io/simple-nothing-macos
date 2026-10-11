@@ -4,7 +4,7 @@
 public enum Read: UInt16, CaseIterable, Sendable {
     case battery = 0xC007, firmware = 0xC042, identity = 0xC006, noise = 0xC01E, preset = 0xC050
     case spatial = 0xC04F, lowLatency = 0xC041, bass = 0xC04E, gestures = 0xC018
-    case dualConnection = 0xC027, codec = 0xC029, soundProfile = 0xC05A
+    case dualConnection = 0xC027, codec = 0xC029, soundProfile = 0xC05A, customEQ = 0xC044
 
     /// La réponse porte le même numéro, bit de poids fort baissé.
     public var reply: UInt16 { rawValue & 0x7FFF }
@@ -12,13 +12,21 @@ public enum Read: UInt16, CaseIterable, Sendable {
 
 public enum Write: UInt16, Sendable {
     case noise = 0xF00F, preset = 0xF01D, spatial = 0xF052, lowLatency = 0xF040
-    case gesture = 0xF003, dualConnection = 0xF01A
+    case gesture = 0xF003, dualConnection = 0xF01A, customEQ = 0xF041
+}
+
+/// Lectures qui prennent un paramètre, envoyées à part.
+public enum Query {
+    /// Appareils de la double connexion, par pages : la donnée est le nombre d'appareils déjà reçus.
+    public static let dualDevices: UInt16 = 0xC028
 }
 
 /// Envois spontanés de l'appareil, sans requête.
 public enum Push {
     public static let battery: UInt16 = 0xE001
     public static let noise: UInt16 = 0xE003
+    /// Un appareil de la double connexion vient de se relier ou de partir.
+    public static let dualDevice: UInt16 = 0xE00E
 }
 
 public enum NoiseMode: UInt8, CaseIterable, Sendable {
@@ -106,4 +114,59 @@ public struct ButtonMapping: Equatable, Sendable {
 
     /// Données de l'écriture qui remplace l'action de ce geste.
     public func writePayload(action: UInt8) -> [UInt8] { [0x01, device, button, type, action] }
+}
+
+/// Un appareil que le casque connaît pour la double connexion.
+public struct DualDevice: Equatable, Sendable {
+    public var address: String
+    public var name: String
+    public var isConnected: Bool
+    /// L'appareil depuis lequel on interroge le casque.
+    public var isSelf: Bool
+}
+
+/// Courbe personnalisée : trois gains en décibels, de -6 à +6.
+public struct CustomEQ: Equatable, Sendable {
+    public var mid: Double
+    public var bass: Double
+    public var treble: Double
+
+    public static let range = -6.0...6.0
+
+    public init(mid: Double, bass: Double, treble: Double) {
+        (self.mid, self.bass, self.treble) = (mid, bass, treble)
+    }
+
+    /// Les trois filtres du CMF Headphone Pro : type sur le fil, fréquence, facteur de qualité.
+    private static let peak: (type: UInt8, frequency: Float, quality: Float) = (1, 980, 0.7)
+    private static let highShelf: (type: UInt8, frequency: Float, quality: Float) = (2, 3500, 1.0)
+    private static let lowShelf: (type: UInt8, frequency: Float, quality: Float) = (0, 140, 0.8)
+
+    /// Nombre de filtres, gain d'ensemble, puis pour chaque filtre : type, gain, fréquence, qualité
+    /// (flottants de 32 bits, petit-boutistes), et trois octets nuls par filtre en fin de trame.
+    /// Le gain d'ensemble compense le plus fort relèvement pour ne pas saturer.
+    public var payload: [UInt8] {
+        let bands = [(Self.peak, mid), (Self.highShelf, treble), (Self.lowShelf, bass)]
+        var bytes: [UInt8] = [UInt8(bands.count)] + Self.bytes(Float(-max(0, mid, bass, treble)))
+        for (filter, gain) in bands {
+            bytes += [filter.type] + Self.bytes(Float(gain)) + Self.bytes(filter.frequency) + Self.bytes(filter.quality)
+        }
+        return bytes + [UInt8](repeating: 0, count: bands.count * 3)
+    }
+
+    public init?(payload: [UInt8]) {
+        guard let count = payload.first, count > 0, payload.count >= 5 + Int(count) * 13 else { return nil }
+        var gains: [UInt8: Double] = [:]
+        for band in 0..<Int(count) {
+            let start = 5 + band * 13
+            gains[payload[start]] = Double(Self.float(Array(payload[(start + 1)...(start + 4)])))
+        }
+        guard let mid = gains[Self.peak.type], let treble = gains[Self.highShelf.type], let bass = gains[Self.lowShelf.type] else { return nil }
+        self.init(mid: mid, bass: bass, treble: treble)
+    }
+
+    private static func bytes(_ value: Float) -> [UInt8] { withUnsafeBytes(of: value.bitPattern.littleEndian) { Array($0) } }
+    private static func float(_ bytes: [UInt8]) -> Float {
+        Float(bitPattern: UInt32(bytes[0]) | UInt32(bytes[1]) << 8 | UInt32(bytes[2]) << 16 | UInt32(bytes[3]) << 24)
+    }
 }

@@ -6,7 +6,7 @@ Une application macOS pour régler les casques et écouteurs Nothing et CMF, que
 
 - **Maquettes interactives** : faites. Deux versions, jour et nuit, tout l'état y est simulé.
 - **Protocole** : la lecture fonctionne sur un CMF Headphone Pro (batterie, firmware, réduction du bruit, égaliseur, audio spatial, commandes, double connexion, codec). Voir [docs/protocole.md](docs/protocole.md). Les réglages aussi : mode de bruit, égaliseur, audio spatial, faible latence et commandes ont été écrits, relus et remis en place sur l'appareil.
-- **Application** : première version. Elle détecte l'appareil relié au Mac, affiche son état réel dans la fenêtre et dans la barre des menus, et envoie les réglages. Seul le CMF Headphone Pro a été vérifié.
+- **Application** : elle détecte l'appareil relié au Mac, affiche son état réel dans la fenêtre et dans la barre des menus, et envoie les réglages. Une carte s'affiche quand l'appareil se connecte, et ⌃⌥A change de mode de bruit depuis n'importe quelle app. Seul le CMF Headphone Pro a été vérifié.
 
 ## Arborescence
 
@@ -50,7 +50,7 @@ Chaque réglage envoyé est suivi d'une relecture : l'écran montre ce que l'app
 tools/app.sh --verify rapport.txt
 ```
 
-L'app modifie tour à tour le mode de bruit, l'égaliseur, l'audio spatial, la faible latence et une commande, relit la réponse de l'appareil, remet chaque valeur d'origine, puis écrit le résultat dans `rapport.txt` (ignoré par git : il contient les trames brutes). C'est le moyen de savoir ce qui marche sur un modèle qui n'a pas encore été vérifié.
+L'app modifie tour à tour le mode de bruit, l'égaliseur, l'audio spatial, la faible latence, une commande et la courbe personnalisée, relit la réponse de l'appareil, remet chaque valeur d'origine, puis écrit le résultat dans `rapport.txt` (ignoré par git : il contient les trames brutes). C'est le moyen de savoir ce qui marche sur un modèle qui n'a pas encore été vérifié.
 
 ## Voir les maquettes
 
@@ -92,8 +92,8 @@ La sonde n'envoie que des lectures. macOS demande l'autorisation Bluetooth au pr
 
 ## Suite prévue
 
-1. Confirmer les écritures restantes (double connexion, renfort des basses).
-2. Compléter l'application : égaliseur personnalisé, carte d'arrivée d'un nouvel appareil, raccourci clavier global, liste de la double connexion.
+1. Confirmer les écritures restantes (égaliseur personnalisé, double connexion, renfort des basses).
+2. Compléter l'application : ouverture au démarrage du Mac, choix du raccourci, appairage d'un appareil jamais relié.
 3. Étendre aux autres modèles, dont les capacités diffèrent.
 
 ## Projets voisins

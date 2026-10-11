@@ -3,10 +3,13 @@ import SwiftUI
 
 /// Options de lancement, pour les captures d'écran et les essais sans casque :
 ///   --demo                     état factice, aucun accès Bluetooth
+///   --demo-custom              avec --demo : égaliseur sur « Personnalisé »
 ///   --section <nom>            listen, controls, link ou device
 ///   --dark | --light           force l'apparence
 ///   --snapshot <fichier.png>   enregistre la fenêtre puis quitte
 ///   --snapshot-menu <fichier>  enregistre le panneau de la barre des menus puis quitte
+///   --snapshot-hud <fichier>   enregistre la carte de connexion puis quitte
+///   --snapshot-toast <fichier> enregistre la confirmation du raccourci clavier puis quitte
 ///   --verify <fichier.txt>     essaie chaque réglage sur l'appareil, le remet en place, écrit un rapport
 ///   -AppleLanguages "(en)"     force la langue
 enum Launch {
@@ -27,15 +30,42 @@ enum Launch {
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     static let headset = Headset(demo: Launch.isDemo)
+    /// Ouvre la fenêtre principale ; fourni par SwiftUI dès que la barre des menus est en place.
+    static var openMain: (() -> Void)?
+    private static var hotKey: HotKey?
+
+    static func showMainWindow() {
+        openMain?()
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    /// Met le raccourci global en accord avec le réglage : ⌃⌥A passe au mode de bruit suivant.
+    static func applyShortcut() {
+        hotKey = nil
+        guard UserDefaults.standard.bool(forKey: "shortcutEnabled"), !Launch.arguments.contains(where: { $0.hasPrefix("--snapshot") || $0 == "--verify" }) else { return }
+        hotKey = HotKey(character: "a", modifiers: HotKey.controlOption) {
+            if let mode = headset.cycleNoise() { HUD.shared.show(ModeToast(mode: mode), seconds: 1.8) }
+        }
+    }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         if Launch.arguments.contains("--dark") { NSApp.appearance = NSAppearance(named: .darkAqua) }
         if Launch.arguments.contains("--light") { NSApp.appearance = NSAppearance(named: .aqua) }
-        Self.headset.start()
-        if let path = Launch.path("--verify") { Verification(headset: Self.headset, report: path).run() }
-        if let path = Launch.path("--snapshot-menu") {
-            DispatchQueue.main.asyncAfter(deadline: .now() + (Launch.isDemo ? 1.5 : 5)) { self.snapshotMenu(to: path) }
+        UserDefaults.standard.register(defaults: ["shortcutEnabled": true, "arrivalCard": true])
+        Self.headset.onArrival = {
+            if UserDefaults.standard.bool(forKey: "arrivalCard") { HUD.shared.show(ArrivalCard(headset: Self.headset), seconds: 4.5) }
         }
+        Self.applyShortcut()
+        Self.headset.start()
+        let extras: [(String, AnyView)] = [("--snapshot-menu", AnyView(MenuBarPanel(headset: Self.headset).clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous)))),
+                                           ("--snapshot-hud", AnyView(ArrivalCard(headset: Self.headset).padding(HUD.margin))),
+                                           ("--snapshot-toast", AnyView(ModeToast(mode: Self.headset.state.noise ?? .transparency).padding(HUD.margin)))]
+        for (option, view) in extras {
+            if let path = Launch.path(option) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + (Launch.isDemo ? 1.5 : 5)) { self.snapshot(view, to: path) }
+            }
+        }
+        if let path = Launch.path("--verify") { Verification(headset: Self.headset, report: path).run() }
         if let path = Launch.path("--snapshot") {
             DispatchQueue.main.asyncAfter(deadline: .now() + (Launch.isDemo ? 1.5 : 5)) { self.snapshot(to: path) }
         }
@@ -47,9 +77,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         save(view, to: path)
     }
 
-    /// Le panneau n'existe qu'une fois la barre des menus cliquée : on le monte dans une fenêtre à part.
-    private func snapshotMenu(to path: String) {
-        let host = NSHostingView(rootView: MenuBarPanel(headset: Self.headset).clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous)))
+    /// Panneau et cartes n'existent qu'un instant à l'écran : on les monte dans une fenêtre à part.
+    private func snapshot(_ view: AnyView, to path: String) {
+        let host = NSHostingView(rootView: view)
         let window = NSWindow(contentRect: CGRect(origin: .zero, size: host.fittingSize), styleMask: .borderless, backing: .buffered, defer: false)
         window.isOpaque = false
         window.backgroundColor = .clear
@@ -71,6 +101,7 @@ struct NothingXApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     @ObservedObject private var headset = AppDelegate.headset
     @AppStorage("section") private var section = Pane.listen
+    @Environment(\.openWindow) private var openWindow
 
     init() {
         Typeface.register()
@@ -94,7 +125,7 @@ struct NothingXApp: App {
         MenuBarExtra {
             MenuBarPanel(headset: headset)
         } label: {
-            Image(systemName: "headphones")
+            Image(systemName: "headphones").onAppear { AppDelegate.openMain = { openWindow(id: "main") } }
             if headset.status == .connected, let level = headset.state.mainBattery { Text(tr("%d %%", level.percent)) }
         }
         .menuBarExtraStyle(.window)

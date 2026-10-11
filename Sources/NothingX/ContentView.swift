@@ -20,7 +20,8 @@ struct ContentView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                .disabled(!connected).opacity(connected ? 1 : 0.4)
+                // Les réglages de l'app, dans « Appareil », restent utilisables sans appareil relié.
+                .disabled(!connected && section != .device).opacity(connected || section == .device ? 1 : 0.4)
             }
         }
         // Le contenu monte sous la barre de titre masquée ; la fenêtre fait 920 × 620 en tout.

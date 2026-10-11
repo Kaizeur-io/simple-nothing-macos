@@ -22,6 +22,8 @@ extension NoiseMode {
     }
 
     static let levels: [NoiseMode] = [.low, .mid, .high, .adaptive]
+
+    var symbol: String { self == .off ? "circle.slash" : self == .transparency ? "person.wave.2" : "ear.badge.waveform" }
 }
 
 extension Preset {
@@ -50,15 +52,15 @@ extension Preset {
     /// Ordre de l'app mobile.
     static let shown: [Preset] = [.pop, .rock, .electronic, .vocal, .classical, .custom]
 
-    /// Allure de la courbe : médiums, graves, aigus. Sert au dessin, pas au son.
-    var shape: (mid: Double, bass: Double, treble: Double) {
+    /// Allure de la courbe des préréglages d'usine. Sert au dessin, pas au son.
+    var shape: CustomEQ {
         switch self {
-        case .pop: (4, 1, 1)
-        case .rock: (-1, 4, 3)
-        case .electronic: (-3, 5, 4)
-        case .vocal: (5, -3, -1)
-        case .classical: (1, -1, 4)
-        case .dirac, .custom: (0, 0, 0)
+        case .pop: CustomEQ(mid: 4, bass: 1, treble: 1)
+        case .rock: CustomEQ(mid: -1, bass: 4, treble: 3)
+        case .electronic: CustomEQ(mid: -3, bass: 5, treble: 4)
+        case .vocal: CustomEQ(mid: 5, bass: -3, treble: -1)
+        case .classical: CustomEQ(mid: 1, bass: -1, treble: 4)
+        case .dirac, .custom: CustomEQ(mid: 0, bass: 0, treble: 0)
         }
     }
 }

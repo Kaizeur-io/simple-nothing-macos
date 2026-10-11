@@ -22,6 +22,12 @@ struct ListenSection: View {
     private var preset: Preset { headset.state.preset ?? .pop }
     private var spatial: SpatialMode { headset.state.spatial ?? .off }
 
+    /// Courbe en cours de glissement, avant d'être envoyée.
+    @State private var draft: CustomEQ?
+    private var curve: CustomEQ {
+        preset == .custom ? draft ?? headset.state.customEQ ?? CustomEQ(mid: 0, bass: 0, treble: 0) : preset.shape
+    }
+
     var body: some View {
         VStack(spacing: 10) {
             HStack(spacing: 10) {
@@ -71,9 +77,13 @@ struct ListenSection: View {
     private var equalizerCard: some View {
         Card {
             HStack(spacing: 22) {
-                EqualizerShape(preset: preset).padding(.vertical, -4)
+                EqualizerShape(curve, name: preset.label, edit: preset != .custom ? nil : { curve, done in
+                    draft = done ? nil : curve
+                    if done { headset.setCustomEQ(curve) }
+                })
+                .animation(.easeInOut(duration: 0.35), value: preset).padding(.vertical, -4)
                 VStack(alignment: .leading, spacing: 14) {
-                    CardHead(title: "Égaliseur", subtitle: preset == .custom ? "Personnalisé · courbe réglée dans l'app mobile" : preset.label)
+                    CardHead(title: "Égaliseur", subtitle: preset == .custom ? "Personnalisé · déplacez les trois points" : preset.label)
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible())], spacing: 8) {
                         ForEach(Preset.shown, id: \.self) { item in
                             Button { headset.setPreset(item) } label: {
@@ -143,6 +153,17 @@ struct LinkSection: View {
                           isOn: headset.state.dualConnection ?? false, set: headset.setDualConnection)
                     .padding(.horizontal, 16).frame(minHeight: 48)
             }
+            if headset.state.dualConnection == true, !headset.state.dualDevices.isEmpty {
+                SectionTitle("Appareils reliés")
+                RowGroup {
+                    ForEach(headset.state.dualDevices, id: \.address) { device in
+                        Row(symbol: device.isSelf ? "laptopcomputer" : "dot.radiowaves.left.and.right", title: device.name.isEmpty ? device.address : device.name,
+                            subtitle: device.isSelf ? "Cet ordinateur" : nil) {
+                            Caps(device.isConnected ? "Connecté" : "Enregistré", color: device.isConnected ? .nText : .nMuted)
+                        }
+                    }
+                }
+            }
             SectionTitle("Qualité audio")
             RowGroup {
                 Row(symbol: "waveform", title: "Codec", subtitle: "LDAC indisponible : macOS ne le propose pas en Bluetooth") {
@@ -159,6 +180,8 @@ struct LinkSection: View {
 struct DeviceSection: View {
     @ObservedObject var headset: Headset
     @AppStorage("finish") private var finish = Finish.darkGrey
+    @AppStorage("shortcutEnabled") private var shortcutEnabled = true
+    @AppStorage("arrivalCard") private var arrivalCard = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -182,6 +205,15 @@ struct DeviceSection: View {
                 Row(title: "N° de série") { value(headset.state.serial ?? "–") }
                 Row(title: "Adresse Bluetooth") { value(headset.address) }
                 Row(title: "Firmware") { value(headset.state.firmware ?? "–") }
+            }
+            SectionTitle("Application")
+            RowGroup {
+                ToggleRow(symbol: "keyboard", title: "Changer de mode de bruit au clavier", subtitle: "Raccourci ⌃⌥A, actif dans toutes les apps",
+                          isOn: shortcutEnabled) { shortcutEnabled = $0; AppDelegate.applyShortcut() }
+                    .padding(.horizontal, 16).frame(minHeight: 48)
+                ToggleRow(symbol: "rectangle.topthird.inset.filled", title: "Carte à la connexion", subtitle: "S'affiche quand l'appareil se relie au Mac",
+                          isOn: arrivalCard) { arrivalCard = $0 }
+                    .padding(.horizontal, 16).frame(minHeight: 48)
             }
             if let model = headset.model, !model.verified {
                 Text(tr("Ce modèle n'a pas encore été vérifié : certains réglages peuvent manquer."))

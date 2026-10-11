@@ -17,8 +17,9 @@ final class Verification {
     func run() {
         headset.onFrame = { [weak self] frame in
             self?.received.append(frame)
-            // Le numéro de série n'a rien à faire dans un rapport qu'on risque de partager.
-            let bytes = frame.command == Read.identity.reply ? "(masqué)" : frame.payload.map { String(format: "%02x", $0) }.joined(separator: " ")
+            // Numéro de série et adresses des autres appareils n'ont rien à faire dans un rapport qu'on risque de partager.
+            let personal = [Read.identity.reply, Query.dualDevices & 0x7FFF, Push.dualDevice].contains(frame.command)
+            let bytes = personal ? "(masqué, \(frame.payload.count) octets)" : frame.payload.map { String(format: "%02x", $0) }.joined(separator: " ")
             self?.lines.append(String(format: "    ← 0x%04X  ", frame.command) + bytes)
         }
         Task { @MainActor in
@@ -52,6 +53,11 @@ final class Verification {
                 await check("commande (appui long)", set: { self.headset.setAction(other, for: .buttonHold) }, expect: { $0.gesture(.buttonHold)?.action == other })
                 await check("commande, retour", set: { self.headset.setAction(hold.action, for: .buttonHold) }, expect: { $0.gesture(.buttonHold)?.action == hold.action })
             }
+            // En dernier : cet essai laisse une courbe plate enregistrée si l'appareil n'en avait aucune.
+            let trial = CustomEQ(mid: 2, bass: -1, treble: 3), before = start.customEQ ?? CustomEQ(mid: 0, bass: 0, treble: 0)
+            await check("égaliseur personnalisé", set: { self.headset.setCustomEQ(trial) }, expect: { $0.customEQ == trial })
+            await check("égaliseur personnalisé, retour", set: { self.headset.setCustomEQ(before) }, expect: { $0.customEQ == before })
+            lines.append("Appareils de la double connexion reçus : \(headset.state.dualDevices.count)")
             lines.append("Non essayé : double connexion (peut couper la liaison).")
             finish(nil)
         }

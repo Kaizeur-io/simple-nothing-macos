@@ -54,7 +54,7 @@
 "Électro" = "Electro";
 "Voix" = "Vocals";
 "Perso" = "Custom";
-"Personnalisé · courbe réglée dans l'app mobile" = "Custom · curve set in the mobile app";
+"Personnalisé · déplacez les trois points" = "Custom · drag the three points";
 "Médiums" = "Mid";
 "Graves" = "Bass";
 "Aigus" = "Treble";
@@ -89,7 +89,16 @@
 "Qualité audio" = "Audio quality";
 "LDAC indisponible : macOS ne le propose pas en Bluetooth" = "LDAC unavailable: macOS does not offer it over Bluetooth";
 
+"Appareils reliés" = "Linked devices";
+"Cet ordinateur" = "This computer";
+"Enregistré" = "Saved";
+
 /* Appareil */
+"Application" = "App";
+"Changer de mode de bruit au clavier" = "Switch noise mode from the keyboard";
+"Raccourci ⌃⌥A, actif dans toutes les apps" = "Shortcut ⌃⌥A, works in every app";
+"Carte à la connexion" = "Connection card";
+"S'affiche quand l'appareil se relie au Mac" = "Appears when the device connects to this Mac";
 "Informations" = "Information";
 "Modèle" = "Model";
 "Couleur" = "Colour";
