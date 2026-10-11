@@ -1,6 +1,6 @@
 // Interroge un appareil Nothing / CMF en lecture seule, directement sur son canal Bluetooth.
 //
-//   tools/build-probe.sh && .build/probe            (appareil déjà connecté au Mac)
+//   tools/probe.sh                                  (appareil déjà connecté au Mac)
 //
 // N'envoie que des requêtes de lecture (commandes 0xC0xx) : rien n'est modifié sur l'appareil.
 // Sert à vérifier que le protocole répond avant d'écrire l'application.
@@ -16,12 +16,17 @@ let serviceUUID: [UInt8] = [0xAE, 0xAC, 0x4A, 0x03, 0xDF, 0xF5, 0x49, 0x8F, 0x84
 
 let reads: [(UInt16, String)] = [
     (0xC007, "batterie"), (0xC042, "firmware"), (0xC006, "numéro de série"), (0xC01E, "réduction du bruit"),
-    (0xC01F, "égaliseur"), (0xC04F, "audio spatial"), (0xC041, "faible latence"), (0xC04E, "renfort des basses"),
-    (0xC018, "commandes"),
+    (0xC01F, "égaliseur"), (0xC050, "mode d'écoute"), (0xC044, "égaliseur perso"), (0xC04F, "audio spatial"),
+    (0xC041, "faible latence"), (0xC04E, "renfort des basses"), (0xC018, "commandes"),
+    (0xC027, "double connexion"), (0xC029, "codec"), (0xC05A, "profil sonore"),
 ]
 let batterySlots: [UInt8: String] = [0x02: "gauche", 0x03: "droite", 0x04: "boîtier", 0x06: "casque"]
 let noiseModes: [UInt8: String] = [0x01: "réduction · haut", 0x02: "réduction · moyen", 0x03: "réduction · bas",
                                    0x04: "réduction · adaptatif", 0x05: "désactivée", 0x07: "transparence"]
+let listeningModes: [UInt8: String] = [0: "Dirac Opteo", 1: "Rock", 2: "Électronique", 3: "Pop", 4: "Améliorer les voix",
+                                       5: "Classique", 6: "Personnalisé"]
+let spatialModes: [UInt8: String] = [0: "désactivé", 1: "fixe", 2: "concert", 3: "théâtre", 4: "jeu"]
+let codecs = ["AAC", "LHDC", "LDAC"]
 
 func hex(_ bytes: [UInt8]) -> String { bytes.isEmpty ? "(vide)" : bytes.map { String(format: "%02x", $0) }.joined(separator: " ") }
 
@@ -52,7 +57,12 @@ func describe(_ command: UInt16, _ data: [UInt8]) -> String {
     case 0x4042: return "firmware : " + (String(bytes: data, encoding: .ascii) ?? "")
     case 0x401E, 0xE003: return data.count > 1 ? "réduction du bruit : " + (noiseModes[data[1]] ?? String(format: "0x%02x", data[1])) : ""
     case 0x401F: return data.isEmpty ? "" : "égaliseur : préréglage n° \(data[0])"
+    case 0x4050: return data.isEmpty ? "" : "mode d'écoute : " + (listeningModes[data[0]] ?? "n° \(data[0])")
+    case 0x404F: return data.isEmpty ? "" : "audio spatial : " + (spatialModes[data[0]] ?? "n° \(data[0])")
     case 0x4041: return data.isEmpty ? "" : "faible latence : " + (data[0] == 1 ? "activée" : "désactivée")
+    case 0x4027: return data.isEmpty ? "" : "double connexion : " + (data[0] == 1 ? "activée" : "désactivée")
+    case 0x4029: return data.isEmpty ? "" : "codec : " + (Int(data[0]) < codecs.count ? codecs[Int(data[0])] : "n° \(data[0])")
+    case 0x405A: return data.isEmpty ? "" : "profil sonore : " + (data[0] == 1 ? "activé" : "désactivé")
     default: return ""
     }
 }
