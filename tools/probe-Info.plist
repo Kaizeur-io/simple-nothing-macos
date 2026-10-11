@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleExecutable</key>
+	<string>probe</string>
+	<key>CFBundleIdentifier</key>
+	<string>local.nothing-mac.probe</string>
+	<key>CFBundleName</key>
+	<string>Sonde casque</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Lire l'état du casque (batterie, modes) par Bluetooth, sans rien modifier.</string>
+</dict>
+</plist>

@@ -1,0 +1,8 @@
+# Sources locales (captures de l'app mobile, images du site) et visuels produit qui en sont tirés :
+# ils appartiennent à Nothing et ne sont pas redistribués. Voir README, « Images produit ».
+sources/
+maquette/assets/
+
+.build/
+.DS_Store
+.claude/settings.local.json
