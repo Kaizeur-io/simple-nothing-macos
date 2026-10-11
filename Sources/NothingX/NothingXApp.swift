@@ -15,6 +15,14 @@ enum Launch {
     static func value(_ name: String) -> String? {
         arguments.firstIndex(of: name).flatMap { arguments.indices.contains($0 + 1) ? arguments[$0 + 1] : nil }
     }
+
+    /// Fichier de sortie. Un chemin relatif part du dossier d'où tools/app.sh a été lancé.
+    static func path(_ name: String) -> String? {
+        value(name).map { path in
+            let base = ProcessInfo.processInfo.environment["NOTHING_PWD"] ?? NSHomeDirectory()
+            return path.hasPrefix("/") ? path : URL(fileURLWithPath: base).appendingPathComponent(path).path
+        }
+    }
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -24,11 +32,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if Launch.arguments.contains("--dark") { NSApp.appearance = NSAppearance(named: .darkAqua) }
         if Launch.arguments.contains("--light") { NSApp.appearance = NSAppearance(named: .aqua) }
         Self.headset.start()
-        if let path = Launch.value("--verify") { Verification(headset: Self.headset, report: path).run() }
-        if let path = Launch.value("--snapshot-menu") {
+        if let path = Launch.path("--verify") { Verification(headset: Self.headset, report: path).run() }
+        if let path = Launch.path("--snapshot-menu") {
             DispatchQueue.main.asyncAfter(deadline: .now() + (Launch.isDemo ? 1.5 : 5)) { self.snapshotMenu(to: path) }
         }
-        if let path = Launch.value("--snapshot") {
+        if let path = Launch.path("--snapshot") {
             DispatchQueue.main.asyncAfter(deadline: .now() + (Launch.isDemo ? 1.5 : 5)) { self.snapshot(to: path) }
         }
     }

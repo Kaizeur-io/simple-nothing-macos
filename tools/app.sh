@@ -4,6 +4,9 @@
 # premier lancement.
 #   tools/app.sh [options de lancement, voir Sources/NothingX/NothingXApp.swift]
 set -e
+# Une app lancée par « open » démarre à la racine du disque : on lui dit d'où vient la commande,
+# pour qu'un chemin relatif (rapport, capture) arrive là où on l'attend.
+here=$PWD
 cd "$(dirname "$0")/.."
 swift build -c release 2>&1 | grep -E "error|warning|Compiling|Build" || true
 app=".build/Nothing X.app"
@@ -42,4 +45,4 @@ iconutil -c icns "$set" -o "$res/AppIcon.icns"
 # Signature locale. L'identité est fixée sur l'identifiant de l'app : sans cela elle changerait à chaque
 # compilation et macOS redemanderait l'accord Bluetooth à chaque fois.
 codesign --force --sign - -r="designated => identifier \"local.nothing-mac.app\"" "$app" >/dev/null 2>&1
-open -n "$app" --args "$@"
+open -n "$app" --env "NOTHING_PWD=$here" --args "$@"
