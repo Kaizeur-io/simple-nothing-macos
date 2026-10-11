@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @ObservedObject var headset: Headset
     @AppStorage("section") private var section = Pane.listen
+    @ObservedObject private var language = Language.shared
 
     private var connected: Bool { headset.status == .connected }
 
@@ -27,6 +28,7 @@ struct ContentView: View {
         // Le contenu monte sous la barre de titre masquée ; la fenêtre fait 920 × 620 en tout.
         .padding(10).frame(maxWidth: .infinity, maxHeight: .infinity).background(Color.nBackground).ignoresSafeArea()
         .frame(width: 920, height: 620 - 28)
+        .id(language.code)  // changer de langue redessine tout
     }
 
     private var tabs: some View {

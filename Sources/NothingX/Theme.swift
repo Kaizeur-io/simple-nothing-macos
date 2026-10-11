@@ -48,9 +48,36 @@ extension Font {
     static func nDot(_ size: CGFloat) -> Font { Typeface.dot.map { .custom($0, size: size) } ?? .system(size: size * 0.8, weight: .semibold, design: .monospaced) }
 }
 
-/// Traduction : les clés sont les textes français, l'anglais est dans Traductions/en.lproj.
+/// Langue de l'interface : celle du système, ou celle choisie dans l'onglet Appareil.
+final class Language: ObservableObject {
+    static let shared = Language()
+    static let choices: [(code: String, label: String)] = [("system", "Système"), ("fr", "Français"), ("en", "English"), ("es", "Español")]
+
+    /// "system", ou le code d'une des langues fournies.
+    @Published private(set) var code = UserDefaults.standard.string(forKey: "language") ?? "system"
+    private(set) var bundle = Bundle.main
+
+    private init() { load() }
+
+    func choose(_ code: String) {
+        UserDefaults.standard.set(code, forKey: "language")
+        // Les menus de macOS (Quitter, Fenêtre…) suivent ce réglage au prochain lancement.
+        if code == "system" { UserDefaults.standard.removeObject(forKey: "AppleLanguages") } else { UserDefaults.standard.set([code], forKey: "AppleLanguages") }
+        self.code = code
+        load()
+    }
+
+    private func load() {
+        bundle = Bundle.main.path(forResource: code, ofType: "lproj").flatMap(Bundle.init(path:)) ?? .main
+    }
+}
+
+/// Le nom de l'app, pris dans son Info.plist : il n'est écrit qu'à cet endroit.
+let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "App"
+
+/// Traduction : les clés sont les textes français ; les autres langues sont dans Traductions/.
 func tr(_ key: String, _ arguments: CVarArg...) -> String {
-    let format = Bundle.main.localizedString(forKey: key, value: key, table: nil)
+    let format = Language.shared.bundle.localizedString(forKey: key, value: key, table: nil)
     return arguments.isEmpty ? format : String(format: format, arguments: arguments)
 }
 

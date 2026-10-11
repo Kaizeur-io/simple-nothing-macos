@@ -1,0 +1,119 @@
+/* Español. Las claves son los textos en francés de la app. */
+
+/* Secciones */
+"Écoute" = "Escucha";
+"Commandes" = "Controles";
+"Connexion" = "Conexión";
+"Appareil" = "Dispositivo";
+"Présentation" = "Visualización";
+
+/* Panel del dispositivo */
+"Aucun appareil" = "Ningún dispositivo";
+"Connecté" = "Conectado";
+"Connexion en cours" = "Conectando";
+"Connexion en cours…" = "Conectando…";
+"Déconnecté" = "Desconectado";
+"Bluetooth n'est pas autorisé pour cette app : Réglages › Confidentialité et sécurité › Bluetooth." = "Bluetooth no está permitido para esta app: Ajustes › Privacidad y seguridad › Bluetooth.";
+"Non autorisé" = "No permitido";
+"Ouvrir les réglages" = "Abrir ajustes";
+"Allumez votre appareil et reliez-le au Mac dans Réglages › Bluetooth." = "Enciende tu dispositivo y conéctalo al Mac en Ajustes › Bluetooth.";
+"Réglages Bluetooth" = "Ajustes de Bluetooth";
+"%d %%" = "%d %%";
+"Batterie %d %%" = "Batería %d %%";
+"en charge" = "cargando";
+
+/* Control de ruido */
+"Réduction du bruit" = "Control de ruido";
+"Réduction" = "Cancelación";
+"Transparence" = "Transparencia";
+"Désactivé" = "Apagado";
+"Désactivée" = "Desactivada";
+"Activé" = "Activado";
+"Activée · %@" = "Activada · %@";
+"Mode transparence" = "Modo transparencia";
+"Bas" = "Bajo";
+"Moyen" = "Medio";
+"Haut" = "Alto";
+"Adaptatif" = "Adaptativo";
+
+/* Audio espacial */
+"Audio spatial" = "Audio espacial";
+"Concert" = "Concierto";
+"Théâtre" = "Cine";
+"Mode concert" = "Modo concierto";
+"Mode théâtre" = "Modo cine";
+"Mode fixe" = "Fijo";
+"Suivi de tête" = "Seguimiento de cabeza";
+"Mode jeu" = "Modo juego";
+
+/* Ecualizador */
+"Égaliseur" = "Ecualizador";
+"Électronique" = "Electrónica";
+"Améliorer les voix" = "Realzar voces";
+"Classique" = "Clásica";
+"Personnalisé" = "Personalizado";
+"Électro" = "Electro";
+"Voix" = "Voces";
+"Perso" = "Propio";
+"Personnalisé · déplacez les trois points" = "Personalizado · arrastra los tres puntos";
+"Médiums" = "Medios";
+"Graves" = "Graves";
+"Aigus" = "Agudos";
+"Courbe d'égalisation : %@" = "Curva de ecualización: %@";
+
+/* Otros ajustes de escucha */
+"Son personnalisé" = "Sonido personal";
+"Calibrage depuis l'app mobile" = "Calibración desde la app móvil";
+"Mode de faible latence" = "Modo de baja latencia";
+
+/* Controles */
+"Bouton" = "Botón";
+"Appuyez une fois" = "Pulsa una vez";
+"Appuyez longuement" = "Mantén pulsado";
+"Curseur d'énergie" = "Deslizador de energía";
+"Curseur" = "Deslizador";
+"Molette de défilement" = "Rueda";
+"Alterne entre les modes de bruit" = "Alterna entre los modos de ruido";
+"Gestes fixes" = "Gestos fijos";
+"1 appui : lecture/pause · 2 : suivant · 3 : précédent · défilement : volume" = "1 pulsación: reproducir/pausar · 2: siguiente · 3: anterior · giro: volumen";
+"Assistant vocal" = "Asistente de voz";
+"Contrôle du bruit" = "Control de ruido";
+"Micro activé/coupé" = "Micrófono sí/no";
+"Préréglage d'égaliseur" = "Preajuste del ecualizador";
+"Aucune action" = "Ninguna acción";
+"Réglage des basses" = "Graves";
+"Réglage des aigus" = "Agudos";
+
+/* Conexión */
+"Double connexion" = "Conexión dual";
+"Reste relié à deux appareils à la fois" = "Sigue conectado a dos dispositivos a la vez";
+"Qualité audio" = "Calidad de audio";
+"LDAC indisponible : macOS ne le propose pas en Bluetooth" = "LDAC no disponible: macOS no lo ofrece por Bluetooth";
+"Appareils reliés" = "Dispositivos vinculados";
+"Cet ordinateur" = "Este ordenador";
+"Enregistré" = "Guardado";
+
+/* Dispositivo */
+"Application" = "Aplicación";
+"Langue" = "Idioma";
+"Système" = "Sistema";
+"Ouvrir au démarrage du Mac" = "Abrir al iniciar el Mac";
+"Reste dans la barre des menus, sans fenêtre" = "Se queda en la barra de menús, sin ventana";
+"Refusé par macOS : installez d'abord l'app dans Applications" = "Rechazado por macOS: instala primero la app en Aplicaciones";
+"Changer de mode de bruit au clavier" = "Cambiar de modo de ruido con el teclado";
+"Raccourci ⌃⌥A, actif dans toutes les apps" = "Atajo ⌃⌥A, activo en todas las apps";
+"Carte à la connexion" = "Tarjeta al conectar";
+"S'affiche quand l'appareil se relie au Mac" = "Aparece cuando el dispositivo se conecta al Mac";
+"Informations" = "Información";
+"Modèle" = "Modelo";
+"Couleur" = "Color";
+"N° de série" = "N.º de serie";
+"Adresse Bluetooth" = "Dirección Bluetooth";
+"Gris foncé" = "Gris oscuro";
+"Gris clair" = "Gris claro";
+"Vert clair" = "Verde claro";
+"Ce modèle n'a pas encore été vérifié : certains réglages peuvent manquer." = "Este modelo aún no se ha verificado: pueden faltar algunos ajustes.";
+
+/* Barra de menús */
+"Ouvrir %@" = "Abrir %@";
+"Quitter" = "Salir";

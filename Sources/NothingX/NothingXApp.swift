@@ -159,7 +159,7 @@ struct NothingXApp: App {
     }
 
     var body: some Scene {
-        Window("Nothing X", id: "main") {
+        Window(appName, id: "main") {
             ContentView(headset: headset)
         }
         .windowStyle(.hiddenTitleBar).windowResizability(.contentSize)

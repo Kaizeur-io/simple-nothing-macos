@@ -210,6 +210,10 @@ struct DeviceSection: View {
             }
             SectionTitle("Application")
             RowGroup {
+                Row(symbol: "globe", title: "Langue") {
+                    ValueMenu(value: Language.choices.first { $0.code == Language.shared.code }?.label ?? "Système",
+                              options: Language.choices.map { choice in (choice.label, { Language.shared.choose(choice.code) }) })
+                }
                 ToggleRow(symbol: "power", title: "Ouvrir au démarrage du Mac",
                           subtitle: loginRefused ? "Refusé par macOS : installez d'abord l'app dans Applications" : "Reste dans la barre des menus, sans fenêtre",
                           isOn: opensAtLogin) { wanted in

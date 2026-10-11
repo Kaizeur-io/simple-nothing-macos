@@ -6,6 +6,7 @@ import SwiftUI
 struct MenuBarPanel: View {
     @ObservedObject var headset: Headset
     @AppStorage("finish") private var finish = Finish.darkGrey
+    @ObservedObject private var language = Language.shared
 
     private var connected: Bool { headset.status == .connected }
     private var state: DeviceState { headset.state }
@@ -61,7 +62,7 @@ struct MenuBarPanel: View {
             HStack {
                 Button { AppDelegate.showMainWindow() } label: {
                     HStack(spacing: 6) {
-                        Text(tr("Ouvrir Nothing X")).font(.system(size: 12, weight: .medium))
+                        Text(tr("Ouvrir %@", appName)).font(.system(size: 12, weight: .medium))
                         Image(systemName: "arrow.up.right").font(.system(size: 9, weight: .semibold))
                     }
                     .foregroundStyle(Color.nText).contentShape(Rectangle())
@@ -75,7 +76,7 @@ struct MenuBarPanel: View {
             }
             .buttonStyle(.plain).padding(.horizontal, 16).frame(height: 42)
         }
-        .frame(width: 320).background(Color.nSurface)
+        .frame(width: 320).background(Color.nSurface).id(language.code)
     }
 
     private var rule: some View { Rectangle().fill(Color.nTrack).frame(height: 1) }

@@ -95,6 +95,8 @@
 
 /* Appareil */
 "Application" = "App";
+"Langue" = "Language";
+"Système" = "System";
 "Ouvrir au démarrage du Mac" = "Open at login";
 "Reste dans la barre des menus, sans fenêtre" = "Stays in the menu bar, without a window";
 "Refusé par macOS : installez d'abord l'app dans Applications" = "Refused by macOS: install the app in Applications first";
@@ -113,5 +115,5 @@
 "Ce modèle n'a pas encore été vérifié : certains réglages peuvent manquer." = "This model has not been verified yet: some settings may be missing.";
 
 /* Barre des menus */
-"Ouvrir Nothing X" = "Open Nothing X";
+"Ouvrir %@" = "Open %@";
 "Quitter" = "Quit";
