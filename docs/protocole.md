@@ -95,26 +95,25 @@ Confirmées le 12 octobre 2026 avec `tools/app.sh --verify` : chaque valeur a é
 | `F01C` | n° de codec | codec (le casque peut redémarrer) | pas essayé |
 | `F051` | activé, niveau | renfort des basses | pas essayé |
 | `F05C` | `01` ou `00` | profil sonore personnel | pas essayé |
-| `F041` | voir plus bas | égaliseur personnalisé | pas essayé |
+| `F041` | voir plus bas | égaliseur personnalisé | confirmé |
 
 ### Égaliseur personnalisé
 
-D'après Ear (web). Les nombres sont des flottants de 32 bits, petit-boutistes.
+Format décrit par Ear (web), confirmé sur l'appareil : la courbe écrite est relue à l'identique. Les nombres sont des flottants de 32 bits, petit-boutistes.
 
 ```
 nombre de filtres | gain d'ensemble | pour chaque filtre : type, gain (dB), fréquence (Hz), qualité | 3 octets nuls par filtre
 ```
 
-Pour ce modèle, trois filtres dans cet ordre : cloche (`01`) à 980 Hz, Q 0,7 pour les médiums ; plateau haut (`02`) à 3 500 Hz, Q 1,0 pour les aigus ; plateau bas (`00`) à 140 Hz, Q 0,8 pour les graves. Le gain d'ensemble vaut l'opposé du plus fort relèvement, pour ne pas saturer. Un casque sans courbe enregistrée répond à `C044` par 109 octets nuls.
+Pour ce modèle, trois filtres dans cet ordre : cloche (`01`) à 980 Hz, Q 0,7 pour les médiums ; plateau haut (`02`) à 3 500 Hz, Q 1,0 pour les aigus ; plateau bas (`00`) à 140 Hz, Q 0,8 pour les graves. Le gain d'ensemble vaut l'opposé du plus fort relèvement, pour ne pas saturer. Un casque sans courbe enregistrée répond à `C044` par 109 octets nuls ; avec une courbe, la réponse garde 109 octets, les filtres en tête, deux octets non identifiés après eux, puis des zéros.
 
 ## Double connexion
 
-`C028` suivi d'un octet (le nombre d'appareils déjà reçus) renvoie une page de la liste dans `4028` : deux octets d'en-tête, le nombre d'appareils de la page, puis pour chacun un octet d'état (quartet haut : c'est l'appareil qui interroge ; quartet bas : il est connecté), six octets d'adresse, la longueur du nom et le nom. On redemande tant qu'une page apporte du nouveau. D'après Ear (web) ; l'app s'en sert, la réponse réelle reste à relever.
+`C028` suivi d'un octet (le nombre d'appareils déjà reçus) renvoie une page de la liste dans `4028` : deux octets d'en-tête, le nombre d'appareils de la page, puis pour chacun un octet d'état (quartet haut : c'est l'appareil qui interroge ; quartet bas : il est connecté), six octets d'adresse, la longueur du nom et le nom. On redemande tant qu'une page apporte du nouveau. Format décrit par Ear (web) ; sur l'appareil la lecture a rendu quatre appareils en une page de 90 octets, et la demande suivante a renvoyé la même page.
 
 `E00E` (un octet d'état, six d'adresse, un octet) arrive quand un appareil se relie ou part : l'app relit alors la liste. Interprétation probable, d'après la forme de la trame.
 
 ## Reste à établir
 
-- L'égaliseur personnalisé sur l'appareil : le format ci-dessous vient d'Ear (web) et n'a pas encore été écrit sur le casque.
 - Le sens de `7C09`, `E019` et `E002` (3 octets), reçus sans rien demander.
 - Le calibrage du profil sonore, qui repose chez Nothing sur un SDK tiers (Audiodo).

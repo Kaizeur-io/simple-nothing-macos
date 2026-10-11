@@ -5,7 +5,7 @@ Une application macOS pour régler les casques et écouteurs Nothing et CMF, que
 ## Où en est le projet
 
 - **Maquettes interactives** : faites. Deux versions, jour et nuit, tout l'état y est simulé.
-- **Protocole** : la lecture fonctionne sur un CMF Headphone Pro (batterie, firmware, réduction du bruit, égaliseur, audio spatial, commandes, double connexion, codec). Voir [docs/protocole.md](docs/protocole.md). Les réglages aussi : mode de bruit, égaliseur, audio spatial, faible latence et commandes ont été écrits, relus et remis en place sur l'appareil.
+- **Protocole** : la lecture fonctionne sur un CMF Headphone Pro (batterie, firmware, réduction du bruit, égaliseur, audio spatial, commandes, double connexion, codec). Voir [docs/protocole.md](docs/protocole.md). Les réglages aussi : mode de bruit, égaliseur (préréglages et courbe personnalisée), audio spatial, faible latence et commandes ont été écrits, relus et remis en place sur l'appareil.
 - **Application** : elle détecte l'appareil relié au Mac, affiche son état réel dans la fenêtre et dans la barre des menus, et envoie les réglages. Une carte s'affiche quand l'appareil se connecte, et ⌃⌥A change de mode de bruit depuis n'importe quelle app. Seul le CMF Headphone Pro a été vérifié.
 
 ## Arborescence
@@ -92,7 +92,7 @@ La sonde n'envoie que des lectures. macOS demande l'autorisation Bluetooth au pr
 
 ## Suite prévue
 
-1. Confirmer les écritures restantes (égaliseur personnalisé, double connexion, renfort des basses).
+1. Confirmer les écritures restantes (double connexion, renfort des basses).
 2. Compléter l'application : ouverture au démarrage du Mac, choix du raccourci, appairage d'un appareil jamais relié.
 3. Étendre aux autres modèles, dont les capacités diffèrent.
 
