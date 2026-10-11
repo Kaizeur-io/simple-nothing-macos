@@ -50,10 +50,10 @@ Puis ouvrir `http://localhost:4173/v2.html`. La barre noire en bas de page pilot
 
 ## Images produit
 
-Les photos des appareils appartiennent à Nothing : elles ne sont pas dans le dépôt. Tant qu'elles n'ont pas été fabriquées, les maquettes fonctionnent mais sans images. Pour les obtenir, placez vos propres fichiers dans `sources/` puis lancez le script :
+Les photos des appareils appartiennent à Nothing : elles ne sont pas dans le dépôt. Tant qu'elles n'ont pas été fabriquées, les maquettes fonctionnent mais sans images. Pour les obtenir, placez vos propres fichiers dans `originaux/` puis lancez le script :
 
-- `sources/captures/` : captures d'écran de l'app mobile (1280 × 2772, nommées `26725.jpg`… comme attendu par le script) ;
-- `sources/site/` : images enregistrées depuis le site Nothing.
+- `originaux/captures/` : captures d'écran de l'app mobile (1280 × 2772, nommées `26725.jpg`… comme attendu par le script) ;
+- `originaux/site/` : images enregistrées depuis le site Nothing.
 
 ```sh
 mkdir -p .build && swiftc -O tools/build-assets.swift -o .build/build-assets && .build/build-assets

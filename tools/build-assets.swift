@@ -1,6 +1,6 @@
 // Fabrique les visuels produit de la maquette à partir des sources locales :
-//   - les captures de l'app mobile (sources/captures/267xx.jpg), recadrées puis détourées ;
-//   - les images récupérées sur le site Nothing (sources/site/ ; PNG déjà transparents : rognés et réduits ;
+//   - les captures de l'app mobile (originaux/captures/267xx.jpg), recadrées puis détourées ;
+//   - les images récupérées sur le site Nothing (originaux/site/ ; PNG déjà transparents : rognés et réduits ;
 //     photos studio sur fond uni : détourées).
 // Ces sources ne sont pas dans le dépôt : chacun fournit les siennes.
 // À lancer depuis la racine du projet :  swiftc -O tools/build-assets.swift -o .build/build-assets && .build/build-assets
@@ -15,8 +15,8 @@ import UniformTypeIdentifiers
 import Vision
 
 let root = FileManager.default.currentDirectoryPath
-let capturesDir = "\(root)/sources/captures"
-let siteDir = "\(root)/sources/site"
+let capturesDir = "\(root)/originaux/captures"
+let siteDir = "\(root)/originaux/site"
 let outDir = "\(root)/maquette/assets"
 let maxSide: CGFloat = 1000
 let fm = FileManager.default
