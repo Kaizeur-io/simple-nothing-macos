@@ -17,7 +17,9 @@ final class Verification {
     func run() {
         headset.onFrame = { [weak self] frame in
             self?.received.append(frame)
-            self?.lines.append(String(format: "    ← 0x%04X  ", frame.command) + frame.payload.map { String(format: "%02x", $0) }.joined(separator: " "))
+            // Le numéro de série n'a rien à faire dans un rapport qu'on risque de partager.
+            let bytes = frame.command == Read.identity.reply ? "(masqué)" : frame.payload.map { String(format: "%02x", $0) }.joined(separator: " ")
+            self?.lines.append(String(format: "    ← 0x%04X  ", frame.command) + bytes)
         }
         Task { @MainActor in
             for _ in 0..<40 where headset.status != .connected || headset.state.gestures.isEmpty { await pause(0.25) }

@@ -33,7 +33,7 @@ Le format des trames et les numéros de commande viennent de la documentation co
 | `C050` mode d'écoute | `4050` | `03` | préréglage de l'égaliseur, voir plus bas ; `03` = Pop, ce qu'affichait l'app |
 | `C044` égaliseur personnalisé | `4044` | 109 octets nuls | aucune courbe enregistrée ; format à établir |
 | `C04F` audio spatial | `404F` | `02 00` | mode, suivi de tête ; `02 00` = Concert, ce qu'affichait l'app |
-| `C041` faible latence | `4041` | `00` | `01` = activée |
+| `C041` faible latence | `4041` | `00` ou `02` | `01` = activée ; `02` = désactivée après une écriture, `00` tant que rien n'a été réglé |
 | `C04E` renfort des basses | `404E` | `00 00` | activé, niveau (le niveau affiché vaut la moitié de l'octet sur les modèles voisins) |
 | `C018` commandes | `4018` | `04` puis 4 × 4 octets | appareil, bouton, geste, action |
 | `C027` double connexion | `4027` | `01` | `01` = activée |
@@ -80,26 +80,26 @@ Actions : `01` aucune, `0b` assistant vocal, `0a` `14` `15` `16` contrôle du br
 
 À l'ouverture du canal le casque envoie de lui-même `4041` (latence), `E003` (réduction du bruit), ainsi que `7C09` et `E019`, non identifiés. Après la lecture de la batterie il renvoie aussi `E001` (même contenu que `4007`).
 
-## Écritures, d'après la documentation, pas encore essayées
+## Écritures
 
-Aucune écriture n'a été envoyée au casque. Ce tableau reprend ce que décrit Ear (web) ; chaque ligne reste à confirmer sur l'appareil.
+Confirmées le 12 octobre 2026 avec `tools/app.sh --verify` : chaque valeur a été écrite, relue dans la réponse de l'appareil, puis remise en place. L'appareil accuse réception par une trame `70xx` vide (même numéro que l'écriture, bit de poids fort baissé).
 
-| Commande | Données | Effet attendu |
-|---|---|---|
-| `F00F` | `01`, mode, `00` | réduction du bruit (mêmes valeurs qu'en lecture) |
-| `F01D` | préréglage, `00` | égaliseur |
-| `F041` | à établir | égaliseur personnalisé |
-| `F052` | mode, suivi de tête | audio spatial |
-| `F051` | activé, niveau | renfort des basses |
-| `F040` | `01 00` activée, `02 00` désactivée | faible latence |
-| `F003` | `01`, appareil, bouton, geste, action | commandes, une à la fois |
-| `F01A` | `01` ou `00` | double connexion |
-| `F01C` | n° de codec | codec (le casque peut redémarrer) |
-| `F05C` | `01` ou `00` | profil sonore personnel |
+| Commande | Données | Effet | État |
+|---|---|---|---|
+| `F00F` | `01`, mode, `00` | réduction du bruit (mêmes valeurs qu'en lecture) ; l'appareil envoie aussi `E003` | confirmé |
+| `F01D` | préréglage, `00` | égaliseur | confirmé |
+| `F052` | mode, suivi de tête | audio spatial | confirmé |
+| `F040` | `01 00` activée, `02 00` désactivée | faible latence ; la relecture donne ensuite `01` ou `02` | confirmé |
+| `F003` | `01`, appareil, bouton, geste, action | commandes, une à la fois | confirmé |
+| `F01A` | `01` ou `00` | double connexion | pas essayé |
+| `F01C` | n° de codec | codec (le casque peut redémarrer) | pas essayé |
+| `F051` | activé, niveau | renfort des basses | pas essayé |
+| `F05C` | `01` ou `00` | profil sonore personnel | pas essayé |
+| `F041` | à établir | égaliseur personnalisé | pas essayé |
 
 ## Reste à établir
 
 - Le format de l'égaliseur personnalisé (`C044` / `F041`). Ear (web) donne pour ce modèle trois filtres : 140 Hz (Q 0,8), 980 Hz (Q 0,7), 3 500 Hz (Q 1,0).
-- Le sens de `7C09` et `E019`.
+- Le sens de `7C09`, `E019`, `E002` (3 octets) et `E00E` (8 octets), reçus sans rien demander.
 - La liste des appareils de la double connexion (`C028`, lecture paginée).
 - Le calibrage du profil sonore, qui repose chez Nothing sur un SDK tiers (Audiodo).

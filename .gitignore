@@ -6,3 +6,4 @@ maquette/assets/
 .build/
 .DS_Store
 .claude/settings.local.json
+rapport*.txt
