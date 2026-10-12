@@ -123,8 +123,7 @@ final class Headset: NSObject, ObservableObject {
 
     @objc private func connectionComplete(_ device: IOBluetoothDevice, status result: IOReturn) {
         guard result == kIOReturnSuccess else { return failConnect() }
-        // Filet : la notification d'arrivée ouvre normalement le canal d'elle-même.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 6) { [weak self] in self?.attach() }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in self?.attach() }
     }
 
     private func failConnect() {
@@ -347,14 +346,16 @@ final class Headset: NSObject, ObservableObject {
             DispatchQueue.main.asyncAfter(deadline: .now() + 4) { [weak self] in self?.attach() }
             return
         }
-        // On laisse macOS finir d'installer la liaison audio avant d'ouvrir notre canal : pendant ces
-        // quelques secondes la radio Bluetooth est très sollicitée, et une souris ou un clavier
-        // Bluetooth s'en ressentent déjà sans nous.
-        Journal.note("appareil relié, ouverture du canal dans 4 s")
+        // L'app le dit tout de suite ; le canal, lui, attend un instant que l'appareil ait ouvert son
+        // service. Quatre secondes d'attente ont été essayées pour ménager la radio : le journal n'a
+        // montré aucun gain, seulement une app qui semblait ne pas voir l'appareil.
+        guard status != .connecting else { return }  // macOS annonce souvent la même arrivée deux fois
+        Journal.note("appareil relié")
         Journal.watchMainThread(for: 30)
         failures = 0
         announceArrival = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 4) { [weak self] in self?.attach() }
+        status = .connecting
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in self?.attach() }
     }
 
     @objc private func deviceDisconnected(_ notification: IOBluetoothUserNotification, device: IOBluetoothDevice) {
