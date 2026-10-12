@@ -1,4 +1,4 @@
-# nothing-mac (projet personnel, non officiel)
+# Simple Nothing pour macOS (non officiel)
 
 [English](README.md) · Français
 
@@ -33,7 +33,7 @@ Vous passez par un assistant de programmation ? Donnez-lui le dépôt et demande
 ```
 Sources/
   NothingKit/    le protocole : trames, commandes, état de l'appareil (sans dépendance, testé)
-  NothingX/      l'application SwiftUI : liaison Bluetooth, fenêtre, barre des menus
+  SimpleNothing/ l'application SwiftUI : liaison Bluetooth, fenêtre, barre des menus
     Traductions/ l'anglais et l'espagnol (les textes de l'app sont écrits en français)
 Tests/           tests de NothingKit, à partir d'octets relevés sur un vrai casque
 maquette/        maquettes HTML/CSS/JS, sans dépendance ni étape de construction
@@ -82,7 +82,7 @@ L'app modifie tour à tour le mode de bruit, l'égaliseur, l'audio spatial, la f
 tools/release.sh
 ```
 
-produit `.build/NothingX-<version>.zip` : l'app seule, sans photo ni police de Nothing (elle dessine alors l'appareil elle-même), prête à joindre à une version GitHub. L'utilisateur la dézippe, la glisse dans Applications et la lance. L'archive n'étant ni signée par un compte développeur Apple ni notarisée, macOS refuse le premier lancement : il faut alors ouvrir Réglages Système › Confidentialité et sécurité et cliquer sur « Ouvrir quand même ».
+produit `.build/SimpleNothing-<version>.zip` : l'app seule, sans photo ni police de Nothing (elle dessine alors l'appareil elle-même), prête à joindre à une version GitHub. L'utilisateur la dézippe, la glisse dans Applications et la lance. L'archive n'étant ni signée par un compte développeur Apple ni notarisée, macOS refuse le premier lancement : il faut alors ouvrir Réglages Système › Confidentialité et sécurité et cliquer sur « Ouvrir quand même ».
 
 ## Sécurité
 

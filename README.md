@@ -1,4 +1,4 @@
-# nothing-mac (personal project, unofficial)
+# Simple Nothing for macOS (unofficial)
 
 English · [Français](README.fr.md)
 
@@ -36,7 +36,7 @@ Only the CMF Headphone Pro has been verified on a real device. Other models are 
 ```
 Sources/
   NothingKit/    the protocol: frames, commands, device state (no dependency, tested)
-  NothingX/      the SwiftUI app: Bluetooth link, window, menu bar
+  SimpleNothing/ the SwiftUI app: Bluetooth link, window, menu bar
     Traductions/ English and Spanish (the app's strings are written in French)
 Tests/           NothingKit tests, built from bytes captured on a real headset
 maquette/        HTML/CSS/JS mockups the app was designed from
@@ -78,7 +78,7 @@ The app changes, one after the other, the noise mode, the equaliser, spatial aud
 tools/release.sh
 ```
 
-produces `.build/NothingX-<version>.zip`: the app alone, with no Nothing picture or font (it then draws the device itself), ready to attach to a GitHub release. People unzip it, drag it to Applications and open it. The archive is neither signed with an Apple developer account nor notarised, so macOS refuses the first launch: open System Settings › Privacy & Security and click "Open Anyway".
+produces `.build/SimpleNothing-<version>.zip`: the app alone, with no Nothing picture or font (it then draws the device itself), ready to attach to a GitHub release. People unzip it, drag it to Applications and open it. The archive is neither signed with an Apple developer account nor notarised, so macOS refuses the first launch: open System Settings › Privacy & Security and click "Open Anyway".
 
 ## Security
 

@@ -1,4 +1,4 @@
-// Nothing X pour Mac — maquette V2 : disposition pensée pour macOS.
+// Simple Nothing — maquette V2 : disposition pensée pour macOS.
 // Onglets permanents à la place des tuiles, menus déroulants à la place des sous-pages,
 // barre des menus enrichie. S'appuie sur shared.js.
 
@@ -205,9 +205,9 @@ function renderChrome() {
        <section class="card"><h3>Réduction du bruit</h3>${modes(ANC2, S.anc.mode, 'anc')}${levels()}</section>
        ${d.feat.includes('spatial') ? `<section class="card inline"><h3>Audio spatial</h3><span class="seg2">${SP2.map(([id, l]) => `<button class="${S.spatial === id ? 'on' : ''}" ${act('spatial', id)}>${l}</button>`).join('')}</span></section>` : ''}
        <section class="card stack"><h3>Égaliseur</h3><div class="chips">${Object.entries(EQ).filter(([id]) => id !== 'custom' || S.eq === 'custom').map(([id, p]) => `<button class="chip ${S.eq === id ? 'on' : ''}" ${act('eq', id)}>${p.label}</button>`).join('')}</div></section>
-       <button class="pop-open" ${act('pop')}>Ouvrir Nothing X</button>
+       <button class="pop-open" ${act('pop')}>Ouvrir Simple Nothing</button>
        <p class="pop-hint"><kbd>⌃</kbd><kbd>⌥</kbd><kbd>A</kbd><span>changer de mode sans ouvrir ce panneau</span></p>`
-    : `<div class="pop-head"><div><b>Nothing X</b><small>Aucun appareil connecté</small></div></div><button class="pop-open" ${act('pop')}>Ouvrir Nothing X</button>`;
+    : `<div class="pop-head"><div><b>Simple Nothing</b><small>Aucun appareil connecté</small></div></div><button class="pop-open" ${act('pop')}>Ouvrir Simple Nothing</button>`;
 
   const h = S.hud;
   $('#hud').innerHTML = !h ? '' : h.type === 'new'

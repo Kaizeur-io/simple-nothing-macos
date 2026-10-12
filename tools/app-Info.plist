@@ -11,13 +11,13 @@
 		<string>es</string>
 	</array>
 	<key>CFBundleExecutable</key>
-	<string>NothingX</string>
+	<string>SimpleNothing</string>
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
-	<string>local.nothing-mac.app</string>
+	<string>io.github.kaizeur-io.simple-nothing</string>
 	<key>CFBundleName</key>
-	<string>Nothing X</string>
+	<string>Simple Nothing</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

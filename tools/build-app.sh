@@ -1,5 +1,5 @@
 #!/bin/sh
-# Compile l'application et fabrique le paquet .build/Nothing X.app, sans le lancer.
+# Compile l'application et fabrique le paquet .build/Simple Nothing.app, sans le lancer.
 # Appelé par tools/app.sh (lancer) et tools/install.sh (installer).
 set -e
 cd "$(dirname "$0")/.."
@@ -17,13 +17,13 @@ if ! swift build -c release >.build-log 2>&1; then
   exit 1
 fi
 rm -f .build-log
-app=".build/Nothing X.app"
+app=".build/Simple Nothing.app"
 res="$app/Contents/Resources"
 rm -rf "$app"
 mkdir -p "$app/Contents/MacOS" "$res"
 cp tools/app-Info.plist "$app/Contents/Info.plist"
-cp .build/release/NothingX "$app/Contents/MacOS/NothingX"
-cp -R Sources/NothingX/Traductions/*.lproj "$res/"
+cp .build/release/SimpleNothing "$app/Contents/MacOS/SimpleNothing"
+cp -R Sources/SimpleNothing/Traductions/*.lproj "$res/"
 
 # Ce qui appartient à Nothing (images, polices) reste hors du dépôt. L'app s'en sert s'il est là,
 # et montre sinon des pictogrammes et des polices du système.
@@ -67,4 +67,4 @@ iconutil -c icns "$set" -o "$res/AppIcon.icns"
 
 # Signature locale. L'identité est fixée sur l'identifiant de l'app : sans cela elle changerait à chaque
 # compilation et macOS redemanderait l'accord Bluetooth à chaque fois.
-codesign --force --sign - -r="designated => identifier \"local.nothing-mac.app\"" "$app" >/dev/null 2>&1
+codesign --force --sign - -r="designated => identifier \"io.github.kaizeur-io.simple-nothing\"" "$app" >/dev/null 2>&1

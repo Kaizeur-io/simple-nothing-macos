@@ -5,7 +5,7 @@
 	<key>CFBundleExecutable</key>
 	<string>probe</string>
 	<key>CFBundleIdentifier</key>
-	<string>local.nothing-mac.probe</string>
+	<string>io.github.kaizeur-io.simple-nothing.probe</string>
 	<key>CFBundleName</key>
 	<string>Sonde casque</string>
 	<key>CFBundlePackageType</key>

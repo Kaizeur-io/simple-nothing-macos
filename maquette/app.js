@@ -1,4 +1,4 @@
-// Nothing X pour Mac — maquette V1 : transposition directe de l'app mobile (tuiles et sous-pages).
+// Simple Nothing — maquette V1 : transposition directe de l'app mobile (tuiles et sous-pages).
 
 // ---------- Pages ----------
 const PAGES = {
@@ -217,8 +217,8 @@ function renderChrome() {
 
   $('#popover').innerHTML = !S.pop ? '' : live
     ? `<div class="pop-head"><img src="${img(d)}" alt=""><div><b>${d.name}</b><small>Connecté · ${S.codec}</small></div><span class="pct">${pct(d)}%</span></div>
-       ${d.feat.includes('anc') ? ancCard() : ''}<button class="pop-open" ${act('pop')}>Ouvrir Nothing X</button>`
-    : `<div class="pop-head"><div><b>Nothing X</b><small>Aucun appareil connecté</small></div></div><button class="pop-open" ${act('pop')}>Ouvrir Nothing X</button>`;
+       ${d.feat.includes('anc') ? ancCard() : ''}<button class="pop-open" ${act('pop')}>Ouvrir Simple Nothing</button>`
+    : `<div class="pop-head"><div><b>Simple Nothing</b><small>Aucun appareil connecté</small></div></div><button class="pop-open" ${act('pop')}>Ouvrir Simple Nothing</button>`;
 
   const h = S.hud;
   $('#hud').innerHTML = !h ? '' : h.type === 'new'

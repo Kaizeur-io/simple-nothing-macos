@@ -2,12 +2,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "NothingMac",
+    name: "SimpleNothing",
     platforms: [.macOS(.v14)],
     targets: [
         .target(name: "NothingKit"),
         // Les traductions sont copiées dans l'app par tools/app.sh, où Bundle.main les trouve.
-        .executableTarget(name: "NothingX", dependencies: ["NothingKit"], exclude: ["Traductions"]),
+        .executableTarget(name: "SimpleNothing", dependencies: ["NothingKit"], exclude: ["Traductions"]),
         .testTarget(name: "NothingKitTests", dependencies: ["NothingKit"]),
     ]
 )

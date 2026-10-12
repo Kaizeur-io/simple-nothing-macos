@@ -1,4 +1,4 @@
-// Nothing X pour Mac — socle commun aux deux maquettes : icônes, données produit, état simulé, briques d'interface.
+// Simple Nothing — socle commun aux deux maquettes : icônes, données produit, état simulé, briques d'interface.
 // Aucune liaison Bluetooth réelle.
 
 const $ = (s) => document.querySelector(s);
@@ -211,7 +211,7 @@ const MODALS = {
       <g transform="rotate(-32 236 160)"><ellipse cx="236" cy="152" rx="44" ry="7"/><ellipse cx="236" cy="164" rx="26" ry="5"/><ellipse cx="236" cy="173" rx="14" ry="3"/></g>
     </svg>
     <button class="pill wide" ${act('closeModal')}>OK</button></div>`,
-  forget: () => `<div class="dialog"><h3>Oublier ${dev().name} ?</h3><p>L'appareil sera retiré de Nothing X sur ce Mac. Vous pourrez l'ajouter de nouveau en le mettant en mode d'appairage.</p>
+  forget: () => `<div class="dialog"><h3>Oublier ${dev().name} ?</h3><p>L'appareil sera retiré de Simple Nothing sur ce Mac. Vous pourrez l'ajouter de nouveau en le mettant en mode d'appairage.</p>
     <div class="btns"><button class="pill" ${act('closeModal')}>Annuler</button><button class="pill red" ${act('forget')}>Oublier</button></div></div>`,
   fwdone: () => `<div class="dialog"><h3>Mise à jour terminée</h3><p>Votre ${dev().short || dev().name} a bien été mis à jour vers la version du firmware ${dev().fw}</p><button class="pill dark wide" ${act('closeModal')}>Confirmer</button></div>`,
   guide: () => `<div class="dialog guide"><div class="guide-head"><h3>Guide de connexion</h3><button ${act('closeModal')} aria-label="Fermer">${I.close}</button></div>

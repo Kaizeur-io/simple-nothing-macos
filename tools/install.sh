@@ -7,8 +7,8 @@ cd "$(dirname "$0")/.."
 # NOTHING_SANS_IMAGES=1 s'en passe ; l'app dessine alors l'appareil elle-même.
 if [ -z "$NOTHING_SANS_IMAGES" ]; then tools/fetch-images.sh || true; fi
 tools/build-app.sh
-osascript -e 'quit app "Nothing X"' >/dev/null 2>&1 || true
-rm -rf "/Applications/Nothing X.app"
-cp -R ".build/Nothing X.app" "/Applications/Nothing X.app"
-open "/Applications/Nothing X.app"
-echo "Installée : /Applications/Nothing X.app"
+osascript -e 'quit app "Simple Nothing"' >/dev/null 2>&1 || true
+rm -rf "/Applications/Simple Nothing.app"
+cp -R ".build/Simple Nothing.app" "/Applications/Simple Nothing.app"
+open "/Applications/Simple Nothing.app"
+echo "Installée : /Applications/Simple Nothing.app"

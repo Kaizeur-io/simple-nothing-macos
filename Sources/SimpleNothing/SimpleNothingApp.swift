@@ -146,7 +146,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 }
 
 @main
-struct NothingXApp: App {
+struct SimpleNothingApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     @ObservedObject private var headset = AppDelegate.headset
     @AppStorage("section") private var section = Pane.listen
