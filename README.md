@@ -29,7 +29,7 @@ Using a coding assistant? Hand it the repository and ask it to install: [AGENTS.
 - Lives in the menu bar: a panel with the essentials, a card when the device connects, a low-battery notice, and a keyboard shortcut (⌃⌥A unless you change it) to switch noise mode from any app.
 - Rings the device to find it, and connects or disconnects the other devices of the dual connection.
 - Only offers what each model has: bass enhancement, wear detection, spatial audio modes and left / right / case battery appear where the model supports them.
-- Available in English, French and Spanish.
+- Available in English, French and Spanish, in light or dark appearance.
 
 Only the CMF Headphone Pro has been verified on a real device. Other models are recognised and shown, but their settings may differ; see [docs/protocole.md](docs/protocole.md) (in French) for what has been confirmed.
 
@@ -109,8 +109,8 @@ If you have other files of your own, `originaux/` takes them:
 
 ## Roadmap
 
-1. Confirm the remaining writes (dual connection and its device list, ring, and on other models bass enhancement and wear detection).
-2. Complete the app: pairing a device that has never been connected to the Mac, automatic power-off delay, button mapping for earbuds.
+1. Confirm on other models what the CMF Headphone Pro cannot show: bass enhancement, wear detection, earbud gestures, left / right ring.
+2. Complete the app: pairing a device that has never been connected to the Mac, automatic power-off delay (its command is not documented anywhere yet).
 3. Distribution: a downloadable archive, signed and notarised, to install without building.
 4. Extend to other models, whose capabilities differ.
 

@@ -177,6 +177,13 @@ final class Headset: NSObject, ObservableObject {
         write(.gesture, state.gestures[index].writePayload(action: action), thenRead: .gestures)
     }
 
+    /// Même chose pour un geste quelconque, repéré par son appareil, son bouton et son type.
+    func setAction(_ action: UInt8, for mapping: ButtonMapping) {
+        guard let index = state.gestures.firstIndex(where: { ($0.device, $0.button, $0.type) == (mapping.device, mapping.button, mapping.type) }) else { return }
+        state.gestures[index].action = action
+        write(.gesture, state.gestures[index].writePayload(action: action), thenRead: .gestures)
+    }
+
     /// Après chaque écriture on relit la valeur : l'écran montre ce que l'appareil a réellement retenu.
     private func write(_ command: Write, _ payload: [UInt8], thenRead read: Read) {
         guard let link else { return }
@@ -319,7 +326,11 @@ final class Headset: NSObject, ObservableObject {
             (0x4018, [0x04, 0x06, 0x0A, 0x07, 0x01, 0x06, 0x0A, 0x01, 0x0B, 0x06, 0x05, 0x01, 0x23, 0x06, 0x01, 0x07, 0x16]),
         ]
         for (command, payload) in replies { state.apply(Frame(command: command, payload: payload)) }
-        if model?.isHeadphones == false { state.apply(Frame(command: 0x4007, payload: [0x03, 0x02, 0x50, 0x03, 0x4B, 0x04, 0xBC])) }
+        if model?.isHeadphones == false {
+            state.apply(Frame(command: 0x4007, payload: [0x03, 0x02, 0x50, 0x03, 0x4B, 0x04, 0xBC]))
+            let side: [UInt8] = [0x01, 0x02, 0x09, 0x01, 0x03, 0x08, 0x01, 0x07, 0x16, 0x01, 0x09, 0x01]
+            state.apply(Frame(command: 0x4018, payload: [0x08] + [0x02, 0x03].flatMap { device in stride(from: 0, to: 12, by: 3).flatMap { [device] + side[$0..<($0 + 3)] } }))
+        }
         if let level = capabilities.bassSteps.dropFirst().first { state.apply(Frame(command: 0x404E, payload: [0x01, level])) }
         if capabilities.wearDetection { state.apply(Frame(command: 0x400E, payload: [0x00, 0x00, 0x01])) }
         if let percent = Launch.value("--demo-battery").flatMap(UInt8.init) { state.apply(Frame(command: 0x4007, payload: [0x01, 0x06, percent])) }

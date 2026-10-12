@@ -137,7 +137,50 @@ struct ListenSection: View {
 struct ControlsSection: View {
     @ObservedObject var headset: Headset
 
+    /// Les gestes que l'appareil déclare, regroupés par emplacement, dans l'ordre où il les donne.
+    private var places: [(label: String, gestures: [ButtonMapping])] {
+        var groups: [(label: String, gestures: [ButtonMapping])] = []
+        for gesture in headset.state.gestures {
+            if let index = groups.firstIndex(where: { $0.label == gesture.placeLabel }) {
+                groups[index].gestures.append(gesture)
+            } else {
+                groups.append((gesture.placeLabel, [gesture]))
+            }
+        }
+        return groups
+    }
+
     var body: some View {
+        // Le CMF Headphone Pro garde sa page vérifiée ; les autres modèles affichent ce qu'ils déclarent.
+        if headset.model == nil || headset.model == .headphonePro { headphonePro } else { declared }
+    }
+
+    private var declared: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            ForEach(places, id: \.label) { place in
+                SectionTitle(place.label)
+                RowGroup {
+                    ForEach(Array(place.gestures.enumerated()), id: \.offset) { _, gesture in
+                        Row(symbol: gesture.type == 0x07 || gesture.type == 0x09 ? "hand.tap.fill" : "hand.tap", title: gesture.gestureLabel) {
+                            let options = headset.model?.actions(for: gesture) ?? []
+                            let noiseCodes = ButtonMapping.Action.noiseControlAll
+                            if options.isEmpty {
+                                Text(tr(ButtonMapping.label(forAction: gesture.action))).font(.system(size: 12)).foregroundStyle(Color.nMuted)
+                            } else {
+                                ValueMenu(value: ButtonMapping.label(forAction: gesture.action), options: options.map { code in
+                                    (ButtonMapping.label(forAction: code), { if !(noiseCodes.contains(code) && noiseCodes.contains(gesture.action)) { headset.setAction(code, for: gesture) } })
+                                })
+                            }
+                        }
+                        .frame(height: 44)
+                    }
+                }
+            }
+            Spacer(minLength: 0)
+        }
+    }
+
+    private var headphonePro: some View {
         VStack(alignment: .leading, spacing: 8) {
             SectionTitle("Bouton")
             RowGroup {
@@ -293,13 +336,21 @@ struct AppSection: View {
     @AppStorage("shortcutEnabled") private var shortcutEnabled = true
     @AppStorage("arrivalCard") private var arrivalCard = true
     @AppStorage("lowBatteryAlert") private var lowBatteryAlert = true
+    @AppStorage("appearance") private var appearance = "system"
     @State private var opensAtLogin = AppDelegate.opensAtLogin
     @State private var loginRefused = false
+
+    private static let appearances = [("system", "Système"), ("light", "Clair"), ("dark", "Sombre")]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             SectionTitle("Général")
             RowGroup {
+                Row(symbol: "circle.lefthalf.filled", title: "Apparence") {
+                    ValueMenu(value: Self.appearances.first { $0.0 == appearance }?.1 ?? "Système", options: Self.appearances.map { code, label in
+                        (label, { appearance = code; AppDelegate.applyAppearance() })
+                    })
+                }
                 Row(symbol: "globe", title: "Langue") {
                     ValueMenu(value: Language.choices.first { $0.code == Language.shared.code }?.label ?? "Système",
                               options: Language.choices.map { choice in (choice.label, { Language.shared.choose(choice.code) }) })

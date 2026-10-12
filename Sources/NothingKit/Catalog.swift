@@ -85,3 +85,46 @@ public struct Model: Equatable, Sendable {
             .max { $0.name.count < $1.name.count }
     }
 }
+
+extension Model {
+    /// Actions que l'app officielle propose pour un geste, d'après sa configuration par modèle.
+    /// Vide : le geste n'est pas réglable, ou on ne sait pas ce qu'il accepte.
+    public func actions(for mapping: ButtonMapping) -> [UInt8] {
+        typealias A = ButtonMapping.Action
+        let none = [A.none], tracks = [A.previous, A.next, A.voiceAssistant], volume = [A.volumeUp, A.volumeDown]
+        if isHeadphones {
+            switch (mapping.button, mapping.type) {
+            case (0x05, _): return [A.bass, A.treble]
+            case (0x01, 0x07): return [A.noiseControl] + none
+            case (0x0A, 0x07) where id == "B192": return [A.voiceAssistant, A.noiseControl, A.microphone] + none
+            case (0x0A, 0x01), (0x0A, 0x07):
+                let extra = ["B170", "B175"].contains(id) ? A.spatialAudio : A.camera
+                return [A.voiceAssistant, A.noiseControl, extra, A.microphone] + (id == "B192" ? [] : [A.preset]) + none
+            default: return []
+            }
+        }
+        // Écouteurs : seuls les gestes sur la tige se règlent ici, pas ceux du boîtier.
+        guard mapping.button == 0x01, mapping.device == Battery.Slot.left.rawValue || mapping.device == Battery.Slot.right.rawValue else { return [] }
+        let noise = capabilities.noiseControl ? [A.noiseControl] : []
+        let recent = ["B173", "B190"].contains(id)
+        if brand == "CMF" {
+            let off = id == "B163" ? [] : none
+            switch mapping.type {
+            case 0x02: return (id == "B189" ? [] : [A.playPause]) + tracks + off
+            case 0x03: return tracks + off
+            case 0x07: return id == "B189" ? volume + [A.voiceAssistant] + none : noise + [A.voiceAssistant] + off
+            case 0x09: return volume + [A.voiceAssistant] + none
+            default: return []
+            }
+        }
+        switch mapping.type {
+        case 0x02: return id == "B181" ? [] : tracks
+        case 0x03: return tracks + (recent || id == "B181" ? none : [])
+        case 0x07:
+            if id == "B181" { return noise + none }
+            return noise + volume + [A.voiceAssistant] + (recent ? [A.microphone] + none : [])
+        case 0x09: return id == "B181" ? [] : noise + volume + [A.voiceAssistant] + none
+        default: return []
+        }
+    }
+}

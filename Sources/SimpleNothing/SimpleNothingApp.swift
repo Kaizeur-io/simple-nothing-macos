@@ -77,6 +77,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     static func suspendShortcut() { hotKey = nil }
 
+    /// Clair, sombre, ou comme le système : le réglage de l'app, que --dark et --light supplantent.
+    static func applyAppearance() {
+        let forced = Launch.arguments.contains("--dark") ? "dark" : Launch.arguments.contains("--light") ? "light" : nil
+        switch forced ?? UserDefaults.standard.string(forKey: "appearance") {
+        case "dark": NSApp.appearance = NSAppearance(named: .darkAqua)
+        case "light": NSApp.appearance = NSAppearance(named: .aqua)
+        default: NSApp.appearance = nil
+        }
+    }
+
     /// Met le raccourci global en accord avec les réglages : il passe au mode de bruit suivant.
     static func applyShortcut() {
         hotKey = nil
@@ -87,8 +97,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        if Launch.arguments.contains("--dark") { NSApp.appearance = NSAppearance(named: .darkAqua) }
-        if Launch.arguments.contains("--light") { NSApp.appearance = NSAppearance(named: .aqua) }
+        Self.applyAppearance()
         UserDefaults.standard.register(defaults: ["shortcutEnabled": true, "arrivalCard": true, "lowBatteryAlert": true])
         // Une seule copie de l'app peut tenir le canal de l'appareil : une seconde se battrait avec la première.
         // Celle qui arrive en second demande à la première de se montrer, puis s'efface.

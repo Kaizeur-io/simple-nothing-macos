@@ -139,8 +139,8 @@ La sonde n'envoie que des lectures. macOS demande l'autorisation Bluetooth au pr
 
 ## Suite prévue
 
-1. Confirmer les écritures restantes (double connexion et sa liste d'appareils, sonnerie, et sur les autres modèles renfort des basses et détection de port).
-2. Compléter l'application : appairage d'un appareil jamais relié au Mac, délai d'extinction automatique, commandes des écouteurs.
+1. Confirmer sur d'autres modèles ce que le CMF Headphone Pro ne peut pas montrer : renfort des basses, détection de port, gestes des écouteurs, sonnerie gauche / droite.
+2. Compléter l'application : appairage d'un appareil jamais relié au Mac, délai d'extinction automatique (sa commande n'est documentée nulle part pour l'instant).
 3. Distribution : une archive téléchargeable, signée et notarisée, pour installer sans compiler.
 4. Étendre aux autres modèles, dont les capacités diffèrent.
 

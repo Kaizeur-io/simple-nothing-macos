@@ -156,3 +156,4 @@
 "Connecter" = "Conectar";
 "Déconnecter" = "Desconectar";
 "L'appareil redémarre quand on change ce réglage" = "El dispositivo se reinicia al cambiar este ajuste";
+\n\n/* Apparence, gestes des écouteurs */\n"Apparence" = "Apariencia";\n"Clair" = "Claro";\n"Sombre" = "Oscuro";\n"Appuyez deux fois" = "Pulsa dos veces";\n"Appuyez trois fois" = "Pulsa tres veces";\n"Appuyez deux fois et maintenez" = "Pulsa dos veces y mantén";\n"Tournez" = "Gira";\n"Écouteur gauche" = "Auricular izquierdo";\n"Écouteur droit" = "Auricular derecho";\n"Lecture / pause" = "Reproducir / pausar";\n"Piste précédente" = "Pista anterior";\n"Piste suivante" = "Pista siguiente";\n"Volume +" = "Subir volumen";\n"Volume −" = "Bajar volumen";\n"Déclencheur photo" = "Disparador de cámara";\n

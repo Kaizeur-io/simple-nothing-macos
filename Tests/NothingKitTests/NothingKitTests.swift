@@ -120,6 +120,18 @@ import Testing
     #expect(Model.named("Nothing Ear (open)")?.capabilities.noiseControl == false)
 }
 
+@Test func offersTheActionsEachGestureAccepts() {
+    typealias A = ButtonMapping.Action
+    let earA = Model.named("Nothing Ear (a)")!
+    #expect(earA.actions(for: ButtonMapping(device: 0x02, button: 0x01, type: 0x02, action: 0x09)) == [A.previous, A.next, A.voiceAssistant])
+    #expect(earA.actions(for: ButtonMapping(device: 0x03, button: 0x01, type: 0x09, action: 0x01)) == [A.noiseControl, A.volumeUp, A.volumeDown, A.voiceAssistant, A.none])
+    let open = Model.named("Nothing Ear (open)")!
+    #expect(!open.actions(for: ButtonMapping(device: 0x02, button: 0x01, type: 0x07, action: 0x12)).contains(A.noiseControl))
+    let buds = Model.named("CMF Buds Pro 2")!
+    #expect(buds.actions(for: ButtonMapping(device: 0x02, button: 0x01, type: 0x02, action: 0x02)).first == A.playPause)
+    #expect(buds.actions(for: ButtonMapping(device: 0x04, button: 0x01, type: 0x0A, action: 0x17)).isEmpty)
+}
+
 @Test func buildsRingAndDualDevicePayloads() {
     #expect(RingTarget.headset.payload(on: true) == [0x06, 0x01])
     #expect(RingTarget.left.payload(on: false) == [0x02, 0x00])

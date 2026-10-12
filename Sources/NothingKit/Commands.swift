@@ -134,6 +134,8 @@ public struct ButtonMapping: Equatable, Sendable {
         public static let none: UInt8 = 0x01, voiceAssistant: UInt8 = 0x0B, noiseControl: UInt8 = 0x0A
         public static let spatialAudio: UInt8 = 0x1B, microphone: UInt8 = 0x1D, preset: UInt8 = 0x22
         public static let bass: UInt8 = 0x23, treble: UInt8 = 0x24
+        public static let playPause: UInt8 = 0x02, previous: UInt8 = 0x08, next: UInt8 = 0x09
+        public static let volumeUp: UInt8 = 0x12, volumeDown: UInt8 = 0x13, camera: UInt8 = 0x18
         /// Le contrôle du bruit prend quatre valeurs selon les modes que le geste fait défiler.
         public static let noiseControlAll: Set<UInt8> = [0x0A, 0x14, 0x15, 0x16]
     }

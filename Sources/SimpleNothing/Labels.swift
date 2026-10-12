@@ -111,6 +111,44 @@ extension RingTarget {
     }
 }
 
+extension ButtonMapping {
+    /// Libellé d'une action, quel que soit le modèle.
+    static func label(forAction code: UInt8) -> String {
+        if Action.noiseControlAll.contains(code) { return "Contrôle du bruit" }
+        let names: [UInt8: String] = [
+            Action.none: "Aucune action", Action.playPause: "Lecture / pause", Action.previous: "Piste précédente", Action.next: "Piste suivante",
+            Action.voiceAssistant: "Assistant vocal", Action.volumeUp: "Volume +", Action.volumeDown: "Volume −", Action.camera: "Déclencheur photo",
+            Action.spatialAudio: "Audio spatial", Action.microphone: "Micro activé/coupé", Action.preset: "Préréglage d'égaliseur",
+            Action.bass: "Réglage des basses", Action.treble: "Réglage des aigus",
+        ]
+        return names[code] ?? String(format: "0x%02X", code)
+    }
+
+    var gestureLabel: String {
+        switch type {
+        case 0x01: button == 0x05 ? "Curseur" : "Appuyez une fois"
+        case 0x02: "Appuyez deux fois"
+        case 0x03: "Appuyez trois fois"
+        case 0x07: "Appuyez longuement"
+        case 0x09: "Appuyez deux fois et maintenez"
+        case 0x0A: "Tournez"
+        default: String(format: "0x%02X", type)
+        }
+    }
+
+    /// Où se trouve la commande : un écouteur, le boîtier, ou une des commandes du casque.
+    var placeLabel: String {
+        switch (device, button) {
+        case (Battery.Slot.left.rawValue, _): "Écouteur gauche"
+        case (Battery.Slot.right.rawValue, _): "Écouteur droit"
+        case (Battery.Slot.charger.rawValue, _): "Boîtier"
+        case (_, 0x05): "Curseur d'énergie"
+        case (_, 0x01): "Molette de défilement"
+        default: "Bouton"
+        }
+    }
+}
+
 extension ButtonMapping.Control {
     /// Actions proposées par l'app mobile pour cette commande.
     var actions: [(label: String, code: UInt8)] {

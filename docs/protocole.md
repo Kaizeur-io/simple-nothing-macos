@@ -91,13 +91,13 @@ Confirmées le 12 octobre 2026 avec `tools/app.sh --verify` : chaque valeur a é
 | `F052` | mode, suivi de tête | audio spatial | confirmé |
 | `F040` | `01 00` activée, `02 00` désactivée | faible latence ; la relecture donne ensuite `01` ou `02` | confirmé |
 | `F003` | `01`, appareil, bouton, geste, action | commandes, une à la fois | confirmé |
-| `F01A` | `01` ou `00` | double connexion | pas essayé |
+| `F01A` | `01` ou `00` | double connexion | fonctionne à l'usage, depuis l'app |
 | `F01C` | n° de codec | codec (le casque peut redémarrer) | pas essayé |
 | `F051` | activé, niveau | renfort des basses (niveaux `02` à `0A` par pas de 2, ou `00` `05` `0A` sur les modèles à trois crans) | pas essayé, absent du CMF Headphone Pro |
 | `F05C` | `01` ou `00` | profil sonore personnel | pas essayé |
 | `F041` | voir plus bas | égaliseur personnalisé | confirmé |
-| `F01B` | `01` relier ou `00` détacher, puis les 6 octets de l'adresse | un des appareils de la double connexion | pas essayé |
-| `F002` | casque : `06`, puis `01` ou `00` ; écouteurs : `02` gauche ou `03` droite, puis `01` ou `00` ; Ear (1) : `01` ou `00` seul | fait sonner l'appareil pour le retrouver | pas essayé |
+| `F01B` | `01` relier ou `00` détacher, puis les 6 octets de l'adresse | un des appareils de la double connexion | fonctionne à l'usage, depuis l'app |
+| `F002` | casque : `06`, puis `01` ou `00` ; écouteurs : `02` gauche ou `03` droite, puis `01` ou `00` ; Ear (1) : `01` ou `00` seul | fait sonner l'appareil pour le retrouver | fonctionne à l'usage sur le casque (`06 01`) ; formats des écouteurs pas essayés |
 | `F004` | `00 00`, puis `01` ou `00` | détection de port (lecture `C00E`, réponse `400E`, état au troisième octet) | pas essayé, absent du CMF Headphone Pro |
 
 ### Égaliseur personnalisé
@@ -122,7 +122,8 @@ L'app ne propose un réglage que si le modèle l'a. La table (`Capabilities`, da
 
 ## Reste à établir
 
-- L'extinction automatique (`powerOffTime` dans la configuration officielle) : commande inconnue.
+- L'extinction automatique (`powerOffTime` dans la configuration officielle) : commande inconnue, absente d'Ear (web) comme de BudsLink. Il faudrait la relever dans un journal Bluetooth du téléphone pendant qu'on change ce réglage dans l'app officielle.
+- Les gestes des écouteurs : l'app affiche ceux que l'appareil déclare (`C018`) et propose pour chacun les actions de la configuration officielle (`Model.actions(for:)`), mais aucun n'a été écrit sur de vrais écouteurs.
 
 - Le sens de `7C09`, `E019` et `E002` (3 octets), reçus sans rien demander.
 - Le calibrage du profil sonore, qui repose chez Nothing sur un SDK tiers (Audiodo).
