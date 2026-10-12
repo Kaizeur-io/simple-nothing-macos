@@ -96,6 +96,7 @@ struct ArrivalCard: View {
                     }
                     .foregroundStyle(level.percent <= 15 ? Color.nRed : Color.nText).padding(.top, 10)
                 }
+                if headset.state.battery.count > 1 { BatterySplit(battery: headset.state.battery).padding(.top, 10) }
                 if let noise = headset.state.noise {
                     Text(tr("Réduction du bruit") + " : " + tr(noise.summary).lowercased()).font(.system(size: 12)).foregroundStyle(Color.nMuted).padding(.top, 6)
                 }
@@ -106,6 +107,26 @@ struct ArrivalCard: View {
             HUD.shared.hide()
             AppDelegate.showMainWindow()
         }
+    }
+}
+
+/// L'appareil n'a presque plus de batterie.
+struct BatteryToast: View {
+    let percent: Int
+
+    var body: some View {
+        HUDCard(radius: 22) {
+            HStack(spacing: 14) {
+                Image(systemName: "battery.25").font(.system(size: 17)).foregroundStyle(.white).frame(width: 44, height: 44).background(Color.nRed, in: Circle())
+                VStack(alignment: .leading, spacing: 5) {
+                    Caps("Batterie faible", size: 9)
+                    Text(tr("%d %%", percent)).font(.system(size: 15, weight: .semibold)).foregroundStyle(Color.nText)
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(14).frame(width: 270)
+        }
+        .accessibilityElement(children: .ignore).accessibilityLabel(tr("Batterie %d %%", percent))
     }
 }
 

@@ -27,7 +27,9 @@ struct DevicePanel: View {
     }
 
     @ViewBuilder private var battery: some View {
-        if connected, let level = headset.state.mainBattery {
+        if connected, headset.state.battery.count > 1 {
+            BatterySplit(battery: headset.state.battery)
+        } else if connected, let level = headset.state.mainBattery {
             VStack(spacing: 7) {
                 Capsule().fill(Color.nTrack).frame(width: 44, height: 3)
                     .overlay(alignment: .leading) {
@@ -50,5 +52,31 @@ struct DevicePanel: View {
             if connected { Caps([headset.state.codec?.name, headset.state.firmware].compactMap { $0 }.joined(separator: " · ")) }
         }
         .padding(.horizontal, 16)
+    }
+}
+
+/// Écouteurs : un niveau par écouteur et un pour le boîtier.
+struct BatterySplit: View {
+    let battery: [Battery]
+
+    private var parts: [(label: String, level: Battery)] {
+        let names: [(Battery.Slot, String)] = [(.left, "G"), (.right, "D"), (.charger, "Boîtier")]
+        return names.compactMap { slot, label in battery.first { $0.kind == slot }.map { (label, $0) } }
+    }
+
+    var body: some View {
+        HStack(spacing: 16) {
+            ForEach(parts, id: \.label) { part in
+                VStack(spacing: 6) {
+                    Capsule().fill(Color.nTrack).frame(width: 34, height: 3)
+                        .overlay(alignment: .leading) {
+                            Capsule().fill(part.level.percent <= 15 ? Color.nRed : Color.nText).frame(width: 34 * Double(part.level.percent) / 100)
+                        }
+                    Text(tr(part.label) + " " + tr("%d %%", part.level.percent) + (part.level.charging ? " ⚡" : ""))
+                        .font(.nMono(10)).foregroundStyle(Color.nText).lineLimit(1).fixedSize()
+                }
+                .accessibilityElement(children: .ignore).accessibilityLabel(tr(part.label) + " " + tr("Batterie %d %%", part.level.percent))
+            }
+        }
     }
 }

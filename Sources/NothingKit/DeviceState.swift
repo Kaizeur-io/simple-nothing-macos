@@ -8,6 +8,9 @@ public struct DeviceState: Equatable, Sendable {
     public var spatial: SpatialMode?
     public var lowLatency: Bool?
     public var bassEnabled: Bool?
+    /// Niveau du renfort des basses tel qu'il circule ; `Capabilities.bassSteps` donne les valeurs possibles.
+    public var bassLevel: UInt8?
+    public var wearDetection: Bool?
     public var gestures: [ButtonMapping] = []
     public var dualConnection: Bool?
     public var codec: Codec?
@@ -56,8 +59,12 @@ public struct DeviceState: Equatable, Sendable {
             guard let byte = data.first else { return false }
             lowLatency = byte == 1
         case Read.bass.reply:
-            guard let byte = data.first else { return false }
-            bassEnabled = byte == 1
+            guard data.count >= 2 else { return false }
+            bassEnabled = data[0] == 1
+            bassLevel = data[1]
+        case Read.wearDetection.reply:
+            guard data.count >= 3 else { return false }
+            wearDetection = data[2] == 1
         case Read.gestures.reply:
             guard let count = data.first, data.count >= 1 + Int(count) * 4 else { return false }
             gestures = (0..<Int(count)).map { i in

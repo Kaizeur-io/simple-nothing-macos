@@ -93,9 +93,12 @@ Confirmées le 12 octobre 2026 avec `tools/app.sh --verify` : chaque valeur a é
 | `F003` | `01`, appareil, bouton, geste, action | commandes, une à la fois | confirmé |
 | `F01A` | `01` ou `00` | double connexion | pas essayé |
 | `F01C` | n° de codec | codec (le casque peut redémarrer) | pas essayé |
-| `F051` | activé, niveau | renfort des basses | pas essayé |
+| `F051` | activé, niveau | renfort des basses (niveaux `02` à `0A` par pas de 2, ou `00` `05` `0A` sur les modèles à trois crans) | pas essayé, absent du CMF Headphone Pro |
 | `F05C` | `01` ou `00` | profil sonore personnel | pas essayé |
 | `F041` | voir plus bas | égaliseur personnalisé | confirmé |
+| `F01B` | `01` relier ou `00` détacher, puis les 6 octets de l'adresse | un des appareils de la double connexion | pas essayé |
+| `F002` | casque : `06`, puis `01` ou `00` ; écouteurs : `02` gauche ou `03` droite, puis `01` ou `00` ; Ear (1) : `01` ou `00` seul | fait sonner l'appareil pour le retrouver | pas essayé |
+| `F004` | `00 00`, puis `01` ou `00` | détection de port (lecture `C00E`, réponse `400E`, état au troisième octet) | pas essayé, absent du CMF Headphone Pro |
 
 ### Égaliseur personnalisé
 
@@ -113,7 +116,13 @@ Pour ce modèle, trois filtres dans cet ordre : cloche (`01`) à 980 Hz, Q 0,7 p
 
 `E00E` (un octet d'état, six d'adresse, un octet) arrive quand un appareil se relie ou part : l'app relit alors la liste. Interprétation probable, d'après la forme de la trame.
 
+## Ce que chaque modèle sait faire
+
+L'app ne propose un réglage que si le modèle l'a. La table (`Capabilities`, dans `Sources/NothingKit/Catalog.swift`) reprend la configuration que l'app officielle embarque pour chaque modèle : réduction du bruit, modes d'audio spatial, renfort des basses et ses crans, détection de port, sonnerie, double connexion et redémarrage éventuel quand on la change. Pour le CMF Headphone Pro : audio spatial Concert et Théâtre, sonnerie, double connexion sans redémarrage ; ni renfort des basses (le curseur d'énergie en tient lieu), ni détection de port. BudsLink annonce ces deux derniers pour ce modèle, à tort d'après la configuration officielle et d'après la réponse `00 00` à `C04E`.
+
 ## Reste à établir
+
+- L'extinction automatique (`powerOffTime` dans la configuration officielle) : commande inconnue.
 
 - Le sens de `7C09`, `E019` et `E002` (3 octets), reçus sans rien demander.
 - Le calibrage du profil sonore, qui repose chez Nothing sur un SDK tiers (Audiodo).

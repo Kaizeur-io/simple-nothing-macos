@@ -14,16 +14,21 @@ struct MenuBarPanel: View {
         VStack(spacing: 0) {
             header.padding(.horizontal, 16).padding(.top, 14).padding(.bottom, 12)
             if connected {
-                rule
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        Caps("Réduction du bruit")
-                        Spacer()
-                        Caps((state.noise ?? .off).summary, color: .nText)
-                    }
-                    NoiseControls(headset: headset)
+                if state.battery.count > 1 {
+                    BatterySplit(battery: state.battery).frame(maxWidth: .infinity).padding(.bottom, 12)
                 }
-                .padding(16)
+                if headset.capabilities.noiseControl {
+                    rule
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Caps("Réduction du bruit")
+                            Spacer()
+                            Caps((state.noise ?? .off).summary, color: .nText)
+                        }
+                        NoiseControls(headset: headset)
+                    }
+                    .padding(16)
+                }
                 rule
                 VStack(alignment: .leading, spacing: 10) {
                     Caps("Égaliseur")
@@ -32,10 +37,12 @@ struct MenuBarPanel: View {
                             chip(preset.shortLabel, isOn: state.preset == preset) { headset.setPreset(preset) }
                         }
                     }
-                    Caps("Audio spatial").padding(.top, 6)
-                    HStack(spacing: 6) {
-                        ForEach([SpatialMode.concert, .theatre, .off], id: \.self) { mode in
-                            chip(mode.shortLabel, isOn: state.spatial == mode, tint: .nText) { headset.setSpatial(mode) }
+                    if !headset.capabilities.spatial.isEmpty {
+                        Caps("Audio spatial").padding(.top, 6)
+                        HStack(spacing: 6) {
+                            ForEach(headset.capabilities.spatial + [.off], id: \.self) { mode in
+                                chip(mode.shortLabel, isOn: state.spatial == mode, tint: .nText) { headset.setSpatial(mode) }
+                            }
                         }
                     }
                 }

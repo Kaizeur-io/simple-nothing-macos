@@ -132,7 +132,7 @@ struct ModeButton: View {
                     .foregroundStyle(isOn ? Color.nOnText : Color.nText)
                     .background(isOn ? Color.nText : Color.nWell, in: Circle())
                 Text(tr(label)).font(.system(size: 11, weight: isOn ? .semibold : .regular))
-                    .foregroundStyle(isOn ? Color.nText : Color.nMuted).lineLimit(1)
+                    .foregroundStyle(isOn ? Color.nText : Color.nMuted).lineLimit(1).minimumScaleFactor(0.75)
             }
             .frame(maxWidth: .infinity).contentShape(Rectangle())
         }
@@ -195,6 +195,21 @@ struct Row<Trailing: View>: View {
             trailing
         }
         .padding(.horizontal, 16).frame(minHeight: 48)
+    }
+}
+
+/// Petit bouton d'action dans une ligne ; rouge quand il sert à arrêter ce qui est en cours.
+struct PillButton: View {
+    let label: String
+    var isOn = false
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Caps(label, size: 9, color: isOn ? .white : .nText).padding(.horizontal, 12).frame(height: 26)
+                .background(isOn ? Color.nRed : Color.nWell, in: Capsule()).contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
     }
 }
 

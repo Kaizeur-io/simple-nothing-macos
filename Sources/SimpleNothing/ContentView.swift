@@ -18,11 +18,12 @@ struct ContentView: View {
                     case .controls: ControlsSection(headset: headset)
                     case .link: LinkSection(headset: headset)
                     case .device: DeviceSection(headset: headset)
+                    case .app: AppSection()
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                // Les réglages de l'app, dans « Appareil », restent utilisables sans appareil relié.
-                .disabled(!connected && section != .device).opacity(connected || section == .device ? 1 : 0.4)
+                // Les réglages de l'app restent utilisables sans appareil relié.
+                .disabled(!connected && section != .app).opacity(connected || section == .app ? 1 : 0.4)
             }
         }
         // Le contenu monte sous la barre de titre masquée ; la fenêtre fait 920 × 620 en tout.

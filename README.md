@@ -26,7 +26,9 @@ Using a coding assistant? Hand it the repository and ask it to install: [AGENTS.
 
 - Finds the Nothing or CMF device connected to the Mac and shows its real state: battery, noise control, equaliser, spatial audio, low lag mode, button mapping, dual connection, codec, firmware.
 - Changes those settings. Every change is read back from the device, so the screen shows what the device actually kept.
-- Lives in the menu bar: a panel with the essentials, a card when the device connects, and ⌃⌥A to switch noise mode from any app.
+- Lives in the menu bar: a panel with the essentials, a card when the device connects, a low-battery notice, and a keyboard shortcut (⌃⌥A unless you change it) to switch noise mode from any app.
+- Rings the device to find it, and connects or disconnects the other devices of the dual connection.
+- Only offers what each model has: bass enhancement, wear detection, spatial audio modes and left / right / case battery appear where the model supports them.
 - Available in English, French and Spanish.
 
 Only the CMF Headphone Pro has been verified on a real device. Other models are recognised and shown, but their settings may differ; see [docs/protocole.md](docs/protocole.md) (in French) for what has been confirmed.
@@ -107,8 +109,8 @@ If you have other files of your own, `originaux/` takes them:
 
 ## Roadmap
 
-1. Confirm the remaining writes (dual connection, bass enhancement).
-2. Complete the app: bass enhancement, find my device, low-battery notice, left / right / case battery for earbuds, configurable shortcut, pairing a device that has never been connected to the Mac.
+1. Confirm the remaining writes (dual connection and its device list, ring, and on other models bass enhancement and wear detection).
+2. Complete the app: pairing a device that has never been connected to the Mac, automatic power-off delay, button mapping for earbuds.
 3. Distribution: a downloadable archive, signed and notarised, to install without building.
 4. Extend to other models, whose capabilities differ.
 

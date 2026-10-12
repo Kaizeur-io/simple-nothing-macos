@@ -110,3 +110,27 @@ import Testing
     let frames = parser.feed([0x55, 0x00, 0x01, 0x07, 0x40, 0xFF, 0xFF, 0x01] + reply)
     #expect(frames == [Frame(command: 0x4007, sequence: 1, payload: [0x01, 0x06, 0x28])])
 }
+
+@Test func knowsWhatEachModelCanDo() {
+    let headphonePro = Model.headphonePro.capabilities
+    #expect(headphonePro.spatial == [.concert, .theatre])
+    #expect(headphonePro.bassSteps.isEmpty && !headphonePro.wearDetection && headphonePro.ring == [.headset])
+    let earA = Model.named("Nothing Ear (a)")?.capabilities
+    #expect(earA?.bassSteps == [2, 4, 6, 8, 10] && earA?.ring == [.left, .right] && earA?.wearDetection == true)
+    #expect(Model.named("Nothing Ear (open)")?.capabilities.noiseControl == false)
+}
+
+@Test func buildsRingAndDualDevicePayloads() {
+    #expect(RingTarget.headset.payload(on: true) == [0x06, 0x01])
+    #expect(RingTarget.left.payload(on: false) == [0x02, 0x00])
+    #expect(RingTarget.legacy.payload(on: true) == [0x01])
+    let phone = DualDevice(address: "0A:1B:2C:3D:4E:5F", name: "Phone", isConnected: false, isSelf: false)
+    #expect(phone.writePayload(connect: true) == [0x01, 0x0A, 0x1B, 0x2C, 0x3D, 0x4E, 0x5F])
+}
+
+@Test func readsBassAndWearDetection() {
+    var state = DeviceState()
+    state.apply(Frame(command: Read.bass.reply, payload: [0x01, 0x06]))
+    state.apply(Frame(command: Read.wearDetection.reply, payload: [0x00, 0x00, 0x01]))
+    #expect(state.bassEnabled == true && state.bassLevel == 6 && state.wearDetection == true)
+}

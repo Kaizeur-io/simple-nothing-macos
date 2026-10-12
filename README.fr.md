@@ -26,7 +26,7 @@ Vous passez par un assistant de programmation ? Donnez-lui le dépôt et demande
 
 - **Maquettes interactives** : faites. Deux versions, jour et nuit, tout l'état y est simulé.
 - **Protocole** : la lecture fonctionne sur un CMF Headphone Pro (batterie, firmware, réduction du bruit, égaliseur, audio spatial, commandes, double connexion, codec). Voir [docs/protocole.md](docs/protocole.md). Les réglages aussi : mode de bruit, égaliseur (préréglages et courbe personnalisée), audio spatial, faible latence et commandes ont été écrits, relus et remis en place sur l'appareil.
-- **Application** : elle détecte l'appareil relié au Mac, affiche son état réel dans la fenêtre et dans la barre des menus, et envoie les réglages. Une carte s'affiche quand l'appareil se connecte, et ⌃⌥A change de mode de bruit depuis n'importe quelle app. Seul le CMF Headphone Pro a été vérifié.
+- **Application** : elle détecte l'appareil relié au Mac, affiche son état réel dans la fenêtre et dans la barre des menus, et envoie les réglages. Une carte s'affiche quand l'appareil se connecte, une alerte prévient quand sa batterie est faible, et un raccourci clavier (⌃⌥A, modifiable) change de mode de bruit depuis n'importe quelle app. Elle fait sonner l'appareil pour le retrouver, relie ou détache les autres appareils de la double connexion, et ne propose que ce que chaque modèle possède (renfort des basses, détection de port, modes d'audio spatial, batterie gauche / droite / boîtier). Seul le CMF Headphone Pro a été vérifié.
 
 ## Arborescence
 
@@ -139,8 +139,8 @@ La sonde n'envoie que des lectures. macOS demande l'autorisation Bluetooth au pr
 
 ## Suite prévue
 
-1. Confirmer les écritures restantes (double connexion, renfort des basses).
-2. Compléter l'application : renfort des basses, localisation de l'appareil, alerte de batterie faible, batterie gauche / droite / boîtier des écouteurs, choix du raccourci, appairage d'un appareil jamais relié au Mac.
+1. Confirmer les écritures restantes (double connexion et sa liste d'appareils, sonnerie, et sur les autres modèles renfort des basses et détection de port).
+2. Compléter l'application : appairage d'un appareil jamais relié au Mac, délai d'extinction automatique, commandes des écouteurs.
 3. Distribution : une archive téléchargeable, signée et notarisée, pour installer sans compiler.
 4. Étendre aux autres modèles, dont les capacités diffèrent.
 

@@ -7,12 +7,14 @@ import SwiftUI
 ///   --demo                     état factice, aucun accès Bluetooth
 ///   --demo-custom              avec --demo : égaliseur sur « Personnalisé »
 ///   --demo-name <nom>          avec --demo : nom Bluetooth de l'appareil factice, pour voir un autre modèle
-///   --section <nom>            listen, controls, link ou device
+///   --demo-battery <niveau>    avec --demo : niveau de batterie du casque factice
+///   --section <nom>            listen, controls, link, device ou app
 ///   --dark | --light           force l'apparence
 ///   --snapshot <fichier.png>   enregistre la fenêtre puis quitte
 ///   --snapshot-menu <fichier>  enregistre le panneau de la barre des menus puis quitte
 ///   --snapshot-hud <fichier>   enregistre la carte de connexion puis quitte
 ///   --snapshot-toast <fichier> enregistre la confirmation du raccourci clavier puis quitte
+///   --snapshot-battery <fichier> enregistre l'alerte de batterie faible puis quitte
 ///   --verify <fichier.txt>     essaie chaque réglage sur l'appareil, le remet en place, écrit un rapport
 ///   -AppleLanguages "(en)"     force la langue
 enum Launch {
@@ -73,11 +75,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    /// Met le raccourci global en accord avec le réglage : ⌃⌥A passe au mode de bruit suivant.
+    static func suspendShortcut() { hotKey = nil }
+
+    /// Met le raccourci global en accord avec les réglages : il passe au mode de bruit suivant.
     static func applyShortcut() {
         hotKey = nil
         guard UserDefaults.standard.bool(forKey: "shortcutEnabled"), !Launch.arguments.contains(where: { $0.hasPrefix("--snapshot") || $0 == "--verify" }) else { return }
-        hotKey = HotKey(character: "a", modifiers: HotKey.controlOption) {
+        hotKey = HotKey(Shortcut.saved) {
             if let mode = headset.cycleNoise() { HUD.shared.show(ModeToast(mode: mode), seconds: 1.8) }
         }
     }
@@ -85,7 +89,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         if Launch.arguments.contains("--dark") { NSApp.appearance = NSAppearance(named: .darkAqua) }
         if Launch.arguments.contains("--light") { NSApp.appearance = NSAppearance(named: .aqua) }
-        UserDefaults.standard.register(defaults: ["shortcutEnabled": true, "arrivalCard": true])
+        UserDefaults.standard.register(defaults: ["shortcutEnabled": true, "arrivalCard": true, "lowBatteryAlert": true])
         // Une seule copie de l'app peut tenir le canal de l'appareil : une seconde se battrait avec la première.
         // Celle qui arrive en second demande à la première de se montrer, puis s'efface.
         let showRequest = Notification.Name((Bundle.main.bundleIdentifier ?? "simple-nothing") + ".show")
@@ -107,6 +111,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let windowInFront = NSApp.isActive && Self.mainWindow?.isVisible == true
             if UserDefaults.standard.bool(forKey: "arrivalCard"), !windowInFront { HUD.shared.show(ArrivalCard(headset: Self.headset), seconds: 4.5) }
         }
+        Self.headset.onLowBattery = { percent in
+            if UserDefaults.standard.bool(forKey: "lowBatteryAlert") { HUD.shared.show(BatteryToast(percent: percent), seconds: 5) }
+        }
         NotificationCenter.default.addObserver(self, selector: #selector(windowWillClose(_:)), name: NSWindow.willCloseNotification, object: nil)
         // Lancée par macOS à l'ouverture de session : pas de fenêtre, seulement la barre des menus.
         let event = NSAppleEventManager.shared().currentAppleEvent
@@ -124,7 +131,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Self.headset.start()
         let extras: [(String, AnyView)] = [("--snapshot-menu", AnyView(MenuBarPanel(headset: Self.headset).clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous)))),
                                            ("--snapshot-hud", AnyView(ArrivalCard(headset: Self.headset).padding(HUD.margin))),
-                                           ("--snapshot-toast", AnyView(ModeToast(mode: Self.headset.state.noise ?? .transparency).padding(HUD.margin)))]
+                                           ("--snapshot-toast", AnyView(ModeToast(mode: Self.headset.state.noise ?? .transparency).padding(HUD.margin))),
+                                           ("--snapshot-battery", AnyView(BatteryToast(percent: Self.headset.state.mainBattery?.percent ?? 20).padding(HUD.margin)))]
         for (option, view) in extras {
             if let path = Launch.path(option) {
                 DispatchQueue.main.asyncAfter(deadline: .now() + (Launch.isDemo ? 1.5 : 5)) { self.snapshot(view, to: path) }

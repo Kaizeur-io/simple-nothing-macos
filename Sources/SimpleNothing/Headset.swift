@@ -11,8 +11,12 @@ final class Headset: NSObject, ObservableObject {
     @Published private(set) var state = DeviceState()
     @Published private(set) var name = ""
     @Published private(set) var address = ""
+    /// Ce qui sonne en ce moment, à la demande de l'utilisateur.
+    @Published private(set) var ringing: RingTarget?
 
     var model: Model? { Model.named(name) }
+    /// Réglages à proposer ; ceux du dernier appareil vu quand aucun n'est relié.
+    var capabilities: Capabilities { (name.isEmpty ? shownModel : model)?.capabilities ?? Capabilities() }
     /// Le modèle à dessiner : celui qui est relié, sinon le dernier qu'on a vu.
     var shownModel: Model? { model ?? Model.named(UserDefaults.standard.string(forKey: "lastDevice") ?? "") }
 
@@ -43,6 +47,8 @@ final class Headset: NSObject, ObservableObject {
     var onFrame: ((Frame) -> Void)?
     /// Un appareil vient de se relier au Mac (et non : l'app l'a trouvé déjà là en démarrant).
     var onArrival: (() -> Void)?
+    /// La batterie vient de passer sous le seuil d'alerte.
+    var onLowBattery: ((Int) -> Void)?
 
     private var link: Link?
     private var connectWatch: IOBluetoothUserNotification?
@@ -56,6 +62,8 @@ final class Headset: NSObject, ObservableObject {
     /// Tentatives d'ouverture du canal restées sans succès : chacune attend deux fois plus que la précédente.
     private var failures = 0
     private var opening: Date?
+    private var lowBatteryTold = false
+    private var ringStop: DispatchWorkItem?
     private let isDemo: Bool
 
     init(demo: Bool = false) {
@@ -84,6 +92,7 @@ final class Headset: NSObject, ObservableObject {
         poll?.invalidate()
         connectWatch?.unregister()
         disconnectWatch?.unregister()
+        ring(nil)
         link?.close()
         link = nil
     }
@@ -113,6 +122,38 @@ final class Headset: NSObject, ObservableObject {
     func setDualConnection(_ on: Bool) {
         state.dualConnection = on
         write(.dualConnection, [on ? 0x01 : 0x00], thenRead: .dualConnection)
+    }
+
+    /// Relie ou détache un des appareils que le casque connaît. La liste est relue ensuite.
+    func setDualDevice(_ device: DualDevice, connected: Bool) {
+        guard let index = state.dualDevices.firstIndex(of: device) else { return }
+        state.dualDevices[index].isConnected = connected
+        link?.send(Write.dualDevice.rawValue, device.writePayload(connect: connected))
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) { [weak self] in self?.requestDualDevices(reset: false) }
+    }
+
+    func setBass(on: Bool, level: UInt8? = nil) {
+        let level = level ?? state.bassLevel ?? capabilities.bassSteps.first ?? 0
+        (state.bassEnabled, state.bassLevel) = (on, level)
+        write(.bass, [on ? 0x01 : 0x00, level], thenRead: .bass)
+    }
+
+    func setWearDetection(_ on: Bool) {
+        state.wearDetection = on
+        write(.wearDetection, [0x00, 0x00, on ? 0x01 : 0x00], thenRead: .wearDetection)
+    }
+
+    /// Fait sonner l'appareil pour le retrouver, ou l'arrête avec `nil`. La sonnerie est forte :
+    /// elle s'arrête d'elle-même au bout de trente secondes.
+    func ring(_ target: RingTarget?) {
+        ringStop?.cancel()
+        if let ringing { link?.send(Write.ring.rawValue, ringing.payload(on: false)) }
+        ringing = target
+        guard let target else { return }
+        link?.send(Write.ring.rawValue, target.payload(on: true))
+        let stop = DispatchWorkItem { [weak self] in self?.ring(nil) }
+        ringStop = stop
+        DispatchQueue.main.asyncAfter(deadline: .now() + 30, execute: stop)
     }
 
     func setCustomEQ(_ curve: CustomEQ) {
@@ -157,7 +198,10 @@ final class Headset: NSObject, ObservableObject {
             guard let self else { return }
             Journal.note(String(format: "canal ouvert en %.1f s", Date().timeIntervalSince(self.opening ?? Date())))
             self.status = .connected
-            Read.allCases.forEach { link.send($0.rawValue) }
+            // On ne demande pas ce que le modèle n'a pas.
+            let caps = self.capabilities
+            let skipped = [caps.wearDetection ? nil : Read.wearDetection, caps.bassSteps.isEmpty ? Read.bass : nil].compactMap { $0 }
+            Read.allCases.filter { !skipped.contains($0) }.forEach { link.send($0.rawValue) }
             self.requestDualDevices()
         }
         link.onFrame = { [weak self] frame in self?.receive(frame) }
@@ -197,6 +241,15 @@ final class Headset: NSObject, ObservableObject {
         }
         failures = 0
         if frame.command == Push.dualDevice { requestDualDevices() }
+        if let level = state.mainBattery {
+            if level.charging || level.percent > 25 {
+                lowBatteryTold = false
+            } else if level.percent <= 20, !lowBatteryTold {
+                lowBatteryTold = true
+                // À la connexion, la carte d'arrivée affiche déjà le niveau.
+                if !announceArrival { onLowBattery?(level.percent) }
+            }
+        }
         if announceArrival, state.mainBattery != nil {
             announceArrival = false
             Journal.note("état reçu, carte de connexion")
@@ -204,8 +257,8 @@ final class Headset: NSObject, ObservableObject {
         }
     }
 
-    private func requestDualDevices() {
-        state.dualDevices.removeAll()
+    private func requestDualDevices(reset: Bool = true) {
+        if reset { state.dualDevices.removeAll() }
         dualPages = 1
         link?.send(Query.dualDevices, [0])
     }
@@ -217,6 +270,9 @@ final class Headset: NSObject, ObservableObject {
         disconnectWatch = nil
         status = .absent
         state = DeviceState()
+        ringStop?.cancel()
+        ringing = nil
+        lowBatteryTold = false
         if retry { retryLater() }
     }
 
@@ -263,6 +319,10 @@ final class Headset: NSObject, ObservableObject {
             (0x4018, [0x04, 0x06, 0x0A, 0x07, 0x01, 0x06, 0x0A, 0x01, 0x0B, 0x06, 0x05, 0x01, 0x23, 0x06, 0x01, 0x07, 0x16]),
         ]
         for (command, payload) in replies { state.apply(Frame(command: command, payload: payload)) }
+        if model?.isHeadphones == false { state.apply(Frame(command: 0x4007, payload: [0x03, 0x02, 0x50, 0x03, 0x4B, 0x04, 0xBC])) }
+        if let level = capabilities.bassSteps.dropFirst().first { state.apply(Frame(command: 0x404E, payload: [0x01, level])) }
+        if capabilities.wearDetection { state.apply(Frame(command: 0x400E, payload: [0x00, 0x00, 0x01])) }
+        if let percent = Launch.value("--demo-battery").flatMap(UInt8.init) { state.apply(Frame(command: 0x4007, payload: [0x01, 0x06, percent])) }
         if CommandLine.arguments.contains("--demo-custom") {
             state.preset = .custom
             state.customEQ = CustomEQ(mid: 2, bass: -3, treble: 5)

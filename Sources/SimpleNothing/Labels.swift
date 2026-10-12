@@ -84,7 +84,29 @@ extension SpatialMode {
         case .off: "Désactivé"
         case .concert: "Concert"
         case .theatre: "Théâtre"
+        case .fixed: "Fixe"
         default: summary
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .off: "circle.slash"
+        case .fixed: "dot.radiowaves.left.and.right"
+        case .headTracked: "gyroscope"
+        case .concert: "music.mic"
+        case .theatre: "theatermasks"
+        case .game: "gamecontroller"
+        }
+    }
+}
+
+extension RingTarget {
+    var label: String {
+        switch self {
+        case .left: "Gauche"
+        case .right: "Droite"
+        case .headset, .legacy: "Sonner"
         }
     }
 }

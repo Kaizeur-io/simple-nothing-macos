@@ -5,6 +5,7 @@ public enum Read: UInt16, CaseIterable, Sendable {
     case battery = 0xC007, firmware = 0xC042, identity = 0xC006, noise = 0xC01E, preset = 0xC050
     case spatial = 0xC04F, lowLatency = 0xC041, bass = 0xC04E, gestures = 0xC018
     case dualConnection = 0xC027, codec = 0xC029, soundProfile = 0xC05A, customEQ = 0xC044
+    case wearDetection = 0xC00E
 
     /// La réponse porte le même numéro, bit de poids fort baissé.
     public var reply: UInt16 { rawValue & 0x7FFF }
@@ -13,6 +14,31 @@ public enum Read: UInt16, CaseIterable, Sendable {
 public enum Write: UInt16, Sendable {
     case noise = 0xF00F, preset = 0xF01D, spatial = 0xF052, lowLatency = 0xF040
     case gesture = 0xF003, dualConnection = 0xF01A, customEQ = 0xF041
+    /// Relie ou détache un des appareils de la double connexion : 1 ou 0, puis son adresse.
+    case dualDevice = 0xF01B
+    /// Renfort des basses : activé, niveau.
+    case bass = 0xF051
+    /// Pause automatique quand on retire l'appareil : deux octets nuls, puis 1 ou 0.
+    case wearDetection = 0xF004
+    /// Fait sonner l'appareil pour le retrouver.
+    case ring = 0xF002
+}
+
+/// Ce qu'on fait sonner. Le format de la commande dépend de la forme de l'appareil.
+public enum RingTarget: Sendable {
+    case headset, left, right
+    /// Ear (1) : un seul octet, les deux écouteurs à la fois.
+    case legacy
+
+    public func payload(on: Bool) -> [UInt8] {
+        let flag: UInt8 = on ? 1 : 0
+        switch self {
+        case .headset: return [Battery.Slot.headset.rawValue, flag]
+        case .left: return [Battery.Slot.left.rawValue, flag]
+        case .right: return [Battery.Slot.right.rawValue, flag]
+        case .legacy: return [flag]
+        }
+    }
 }
 
 /// Lectures qui prennent un paramètre, envoyées à part.
@@ -123,6 +149,11 @@ public struct DualDevice: Equatable, Sendable {
     public var isConnected: Bool
     /// L'appareil depuis lequel on interroge le casque.
     public var isSelf: Bool
+
+    /// Données de l'écriture qui relie ou détache cet appareil.
+    public func writePayload(connect: Bool) -> [UInt8] {
+        [connect ? 1 : 0] + address.split(separator: ":").compactMap { UInt8($0, radix: 16) }
+    }
 }
 
 /// Courbe personnalisée : trois gains en décibels, de -6 à +6.

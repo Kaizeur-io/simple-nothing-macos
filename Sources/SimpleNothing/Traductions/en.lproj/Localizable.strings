@@ -101,7 +101,6 @@
 "Reste dans la barre des menus, sans fenêtre" = "Stays in the menu bar, without a window";
 "Refusé par macOS : installez d'abord l'app dans Applications" = "Refused by macOS: install the app in Applications first";
 "Changer de mode de bruit au clavier" = "Switch noise mode from the keyboard";
-"Raccourci ⌃⌥A, actif dans toutes les apps" = "Shortcut ⌃⌥A, works in every app";
 "Carte à la connexion" = "Connection card";
 "S'affiche quand l'appareil se relie au Mac" = "Appears when the device connects to this Mac";
 "Informations" = "Information";
@@ -122,3 +121,37 @@
 /* Barre des menus */
 "Ouvrir %@" = "Open %@";
 "Quitter" = "Quit";
+
+/* Sonnerie, basses, port, raccourci, alertes */
+"Fixe" = "Fixed";
+"Renfort des basses" = "Bass enhancement";
+"Niveau %d" = "Level %d";
+"Au quotidien" = "Everyday";
+"Faire sonner l'appareil" = "Ring the device";
+"Son fort : retirez d'abord l'appareil de vos oreilles" = "Loud sound: take the device off your ears first";
+"Sonner" = "Ring";
+"Gauche" = "Left";
+"Droite" = "Right";
+"Arrêter" = "Stop";
+"La sonnerie est forte" = "The ring is loud";
+"Faire sonner" = "Ring";
+"Annuler" = "Cancel";
+"Ne la lancez pas avec l'appareil sur les oreilles. Elle s'arrête seule au bout de 30 secondes." = "Do not start it while wearing the device. It stops by itself after 30 seconds.";
+"Détection de port" = "Wear detection";
+"Met la lecture en pause quand vous retirez l'appareil" = "Pauses playback when you take the device off";
+"Général" = "General";
+"Clavier" = "Keyboard";
+"Alertes" = "Alerts";
+"Actif dans toutes les apps" = "Works in every app";
+"Raccourci" = "Shortcut";
+"Cliquez pour le changer, Échap pour annuler" = "Click to change it, Esc to cancel";
+"Tapez le raccourci…" = "Type the shortcut…";
+"Alerte de batterie faible" = "Low battery alert";
+"Prévient quand l'appareil passe sous 20 %" = "Warns when the device drops below 20%";
+"Batterie faible" = "Low battery";
+"G" = "L";
+"D" = "R";
+"Boîtier" = "Case";
+"Connecter" = "Connect";
+"Déconnecter" = "Disconnect";
+"L'appareil redémarre quand on change ce réglage" = "The device restarts when this setting changes";

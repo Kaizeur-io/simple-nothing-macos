@@ -101,7 +101,6 @@
 "Reste dans la barre des menus, sans fenêtre" = "Se queda en la barra de menús, sin ventana";
 "Refusé par macOS : installez d'abord l'app dans Applications" = "Rechazado por macOS: instala primero la app en Aplicaciones";
 "Changer de mode de bruit au clavier" = "Cambiar de modo de ruido con el teclado";
-"Raccourci ⌃⌥A, actif dans toutes les apps" = "Atajo ⌃⌥A, activo en todas las apps";
 "Carte à la connexion" = "Tarjeta al conectar";
 "S'affiche quand l'appareil se relie au Mac" = "Aparece cuando el dispositivo se conecta al Mac";
 "Informations" = "Información";
@@ -123,3 +122,37 @@
 /* Barra de menús */
 "Ouvrir %@" = "Abrir %@";
 "Quitter" = "Salir";
+
+/* Sonnerie, basses, port, raccourci, alertes */
+"Fixe" = "Fijo";
+"Renfort des basses" = "Refuerzo de graves";
+"Niveau %d" = "Nivel %d";
+"Au quotidien" = "Día a día";
+"Faire sonner l'appareil" = "Hacer sonar el dispositivo";
+"Son fort : retirez d'abord l'appareil de vos oreilles" = "Sonido fuerte: quítate antes el dispositivo de los oídos";
+"Sonner" = "Sonar";
+"Gauche" = "Izquierdo";
+"Droite" = "Derecho";
+"Arrêter" = "Detener";
+"La sonnerie est forte" = "El sonido es fuerte";
+"Faire sonner" = "Hacer sonar";
+"Annuler" = "Cancelar";
+"Ne la lancez pas avec l'appareil sur les oreilles. Elle s'arrête seule au bout de 30 secondes." = "No lo inicies con el dispositivo puesto. Se detiene solo a los 30 segundos.";
+"Détection de port" = "Detección de uso";
+"Met la lecture en pause quand vous retirez l'appareil" = "Pausa la reproducción al quitarte el dispositivo";
+"Général" = "General";
+"Clavier" = "Teclado";
+"Alertes" = "Avisos";
+"Actif dans toutes les apps" = "Funciona en todas las apps";
+"Raccourci" = "Atajo";
+"Cliquez pour le changer, Échap pour annuler" = "Haz clic para cambiarlo, Esc para cancelar";
+"Tapez le raccourci…" = "Escribe el atajo…";
+"Alerte de batterie faible" = "Aviso de batería baja";
+"Prévient quand l'appareil passe sous 20 %" = "Avisa cuando el dispositivo baja del 20 %";
+"Batterie faible" = "Batería baja";
+"G" = "I";
+"D" = "D";
+"Boîtier" = "Estuche";
+"Connecter" = "Conectar";
+"Déconnecter" = "Desconectar";
+"L'appareil redémarre quand on change ce réglage" = "El dispositivo se reinicia al cambiar este ajuste";
