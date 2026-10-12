@@ -1,5 +1,7 @@
 # Protocole : ce qui est vérifié
 
+[English version](protocol.md)
+
 Relevé avec `tools/probe.sh` sur un CMF Headphone Pro (modèle B175, firmware 1.0.1.49) relié à un Mac sous macOS 26.3. La sonde n'envoie que des lectures.
 
 Le format des trames et les numéros de commande viennent de la documentation communautaire du protocole, en particulier [Ear (web)](https://github.com/radiance-project/ear-web) et [BudsLink](https://github.com/maniacx/BudsLink). Aucun code de ces projets n'est repris ici.

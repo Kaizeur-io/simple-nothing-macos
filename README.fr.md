@@ -22,15 +22,26 @@ Ces visuels sont fabriqués à partir de l'app elle-même par `tools/make-screen
 
 ## Installation
 
-Il faut macOS 14 ou plus récent et les outils en ligne de commande d'Apple (`xcode-select --install` s'ils manquent ; Xcode n'est pas nécessaire). Depuis le dossier du dépôt :
+Il faut macOS 14 ou plus récent et les outils en ligne de commande d'Apple (`xcode-select --install` s'ils manquent ; Xcode n'est pas nécessaire). Dans le Terminal :
 
 ```sh
+git clone https://github.com/Kaizeur-io/simple-nothing-macos.git
+cd simple-nothing-macos
 tools/install.sh
 ```
 
 Le script télécharge les photos des appareils (environ 20 Mo, voir plus bas), compile l'app (environ une minute la première fois), la place dans Applications et l'ouvre. Il reste deux gestes : cliquer sur « Autoriser » quand macOS demande l'accès Bluetooth, et jumeler le casque ou les écouteurs au Mac dans Réglages Système › Bluetooth si ce n'est pas déjà fait.
 
 Vous passez par un assistant de programmation ? Donnez-lui le dépôt et demandez-lui de l'installer : [AGENTS.md](AGENTS.md) lui dit quoi faire.
+
+## Appareils pris en charge
+
+| | Modèles |
+|---|---|
+| **Vérifié sur un vrai appareil** | CMF Headphone Pro |
+| **Reconnus, pas encore essayés** | Nothing Headphone (1), Headphone (1) Pro, Headphone (a), Ear (1), Ear (2), Ear (stick), Ear, Ear (a), Ear (open), Ear (3), Ear (3a) · CMF Buds, Buds Pro, Buds Pro 2, Buds 2, Buds 2 Plus, Buds 2a, Buds Neo, Clip Pro |
+
+« Reconnu » veut dire que l'app identifie le modèle, montre sa photo et propose les réglages que l'app officielle a pour lui, avec le même protocole. Rien de cela n'a été essayé sur un vrai appareil : certains réglages peuvent ne pas marcher. Si vous en avez un, `tools/app.sh --verify rapport.txt` (plus bas) dit en une minute ce qui fonctionne, et un ticket avec ce rapport est la contribution la plus utile.
 
 ## Où en est le projet
 
@@ -72,11 +83,11 @@ docs/protocole.md      ce qui est vérifié du protocole
 tools/app.sh
 ```
 
-Ce script lance l'app depuis le dossier du projet, sans toucher à la copie installée. L'app vit dans la barre des menus : fermer la fenêtre ne la quitte pas, et elle ne garde une icône dans le Dock que tant que la fenêtre est ouverte. Avec « Ouvrir au démarrage du Mac » (onglet Appareil), elle est là dès l'ouverture de session et annonce l'appareil quand il se connecte. Ce réglage demande que l'app soit dans `/Applications`.
+Ce script lance l'app depuis le dossier du projet, sans toucher à la copie installée. L'app vit dans la barre des menus : fermer la fenêtre ne la quitte pas, et elle ne garde une icône dans le Dock que tant que la fenêtre est ouverte. Avec « Ouvrir au démarrage du Mac » (onglet Application), elle est là dès l'ouverture de session et annonce l'appareil quand il se connecte. Ce réglage demande que l'app soit dans `/Applications`.
 
 macOS demande l'autorisation Bluetooth au premier lancement. Sans appareil sous la main, `tools/app.sh --demo` montre l'app avec un état factice. Les tests se lancent avec `swift test`.
 
-L'app existe en français, anglais et espagnol. Elle suit la langue du système (anglais pour les langues qu'elle ne connaît pas) et l'onglet Appareil permet d'en choisir une autre.
+L'app existe en français, anglais et espagnol. Elle suit la langue du système (anglais pour les langues qu'elle ne connaît pas) et l'onglet Application permet d'en choisir une autre.
 
 Chaque réglage envoyé est suivi d'une relecture : l'écran montre ce que l'appareil a réellement retenu.
 
@@ -151,10 +162,9 @@ La sonde n'envoie que des lectures. macOS demande l'autorisation Bluetooth au pr
 
 ## Suite prévue
 
-1. Confirmer sur d'autres modèles ce que le CMF Headphone Pro ne peut pas montrer : renfort des basses, détection de port, gestes des écouteurs, sonnerie gauche / droite.
+1. Confirmer les autres modèles sur de vrais appareils, en commençant par ce que le CMF Headphone Pro ne peut pas montrer : renfort des basses, détection de port, gestes des écouteurs, sonnerie gauche / droite.
 2. Compléter l'application : appairage d'un appareil jamais relié au Mac, délai d'extinction automatique (sa commande n'est documentée nulle part pour l'instant).
 3. Distribution : une archive téléchargeable, signée et notarisée, pour installer sans compiler.
-4. Étendre aux autres modèles, dont les capacités diffèrent.
 
 ## Projets voisins
 

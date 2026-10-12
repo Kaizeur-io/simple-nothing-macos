@@ -22,9 +22,11 @@ These pictures are made from the app itself by `tools/make-screens.sh`, with the
 
 ## Install
 
-You need macOS 14 or later and Apple's Command Line Tools (`xcode-select --install` if they are missing; full Xcode is not required). From the repository folder:
+You need macOS 14 or later and Apple's Command Line Tools (`xcode-select --install` if they are missing; full Xcode is not required). In Terminal:
 
 ```sh
+git clone https://github.com/Kaizeur-io/simple-nothing-macos.git
+cd simple-nothing-macos
 tools/install.sh
 ```
 
@@ -42,7 +44,14 @@ Using a coding assistant? Hand it the repository and ask it to install: [AGENTS.
 - Only offers what each model has: bass enhancement, wear detection, spatial audio modes and left / right / case battery appear where the model supports them.
 - Available in English, French and Spanish, in light or dark appearance.
 
-Only the CMF Headphone Pro has been verified on a real device. Other models are recognised and shown, but their settings may differ; see [docs/protocole.md](docs/protocole.md) (in French) for what has been confirmed.
+## Supported devices
+
+| | Models |
+|---|---|
+| **Verified on a real device** | CMF Headphone Pro |
+| **Recognised, not tested yet** | Nothing Headphone (1), Headphone (1) Pro, Headphone (a), Ear (1), Ear (2), Ear (stick), Ear, Ear (a), Ear (open), Ear (3), Ear (3a) · CMF Buds, Buds Pro, Buds Pro 2, Buds 2, Buds 2 Plus, Buds 2a, Buds Neo, Clip Pro |
+
+"Recognised" means the app identifies the model, shows its picture and offers the settings the official app has for it, using the same protocol. None of that has been tried on real hardware, so some settings may not work. If you own one of these, `tools/app.sh --verify report.txt` (below) tells you in a minute what works, and an issue with that report is the most useful contribution you can make. See [docs/protocol.md](docs/protocol.md) for what has been confirmed.
 
 ## Repository layout
 
@@ -64,7 +73,7 @@ tools/
   make-icon.swift      draws the app icon
   build-assets.swift   builds the mockups' pictures from your own sources
   probe.swift, probe.sh   read-only Bluetooth probe
-docs/protocole.md      what has been verified of the protocol (in French)
+docs/protocol.md       what has been verified of the protocol (protocole.md is the French original)
 ```
 
 Code comments, commit messages and the app's source strings are in French.
@@ -75,7 +84,7 @@ Code comments, commit messages and the app's source strings are in French.
 tools/app.sh
 ```
 
-runs the app from the project folder without touching the installed copy. The app lives in the menu bar: closing the window does not quit it, and it only keeps a Dock icon while the window is open. With "Open at login" (Device tab) it is there from the start of the session and announces the device when it connects; that setting needs the app to be in `/Applications`.
+runs the app from the project folder without touching the installed copy. The app lives in the menu bar: closing the window does not quit it, and it only keeps a Dock icon while the window is open. With "Open at login" (App tab) it is there from the start of the session and announces the device when it connects; that setting needs the app to be in `/Applications`.
 
 Without a device at hand, `tools/app.sh --demo` shows the app with made-up data. `swift test` runs the tests.
 
@@ -122,10 +131,9 @@ If you have other files of your own, `originaux/` takes them:
 
 ## Roadmap
 
-1. Confirm on other models what the CMF Headphone Pro cannot show: bass enhancement, wear detection, earbud gestures, left / right ring.
+1. Confirm the other models on real hardware, starting with what the CMF Headphone Pro cannot show: bass enhancement, wear detection, earbud gestures, left / right ring.
 2. Complete the app: pairing a device that has never been connected to the Mac, automatic power-off delay (its command is not documented anywhere yet).
 3. Distribution: a downloadable archive, signed and notarised, to install without building.
-4. Extend to other models, whose capabilities differ.
 
 ## Related projects
 
