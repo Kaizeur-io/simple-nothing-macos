@@ -18,7 +18,7 @@ Hors de la fenêtre : une carte quand l'appareil se connecte, le panneau de la b
 
 ![Carte de connexion, panneau de la barre des menus et confirmations](docs/presentation-barre-des-menus.png)
 
-Ces visuels sont fabriqués à partir de l'app elle-même par `tools/make-screens.sh`, avec la version publique : l'appareil y est dessiné en points. Installée par `tools/install.sh`, l'app montre les vraies photos des produits.
+Ces visuels sont fabriqués à partir de l'app elle-même par `tools/make-screens.sh`, telle qu'on l'obtient après `tools/install.sh`.
 
 ## Installation
 
@@ -129,7 +129,7 @@ Puis ouvrir `http://localhost:4173/v2.html`. La barre noire en bas de page pilot
 Les photos des appareils et les polices appartiennent à Nothing (et à Lineto pour Lettera Mono) : elles ne sont pas dans le dépôt.
 
 - **Photos** : `tools/install.sh` les télécharge une fois depuis le dépôt public d'[Ear (web)](https://github.com/radiance-project/ear-web) et les range dans `originaux/ear-web/`, que git ignore. `NOTHING_SANS_IMAGES=1 tools/install.sh` s'en passe.
-- **Sans photos**, comme sur les captures ci-dessus, l'app dessine elle-même l'appareil et les grands chiffres en matrice de points.
+- **Sans photos**, l'app dessine elle-même l'appareil en matrice de points, comme les grands chiffres.
 - **Polices** : l'app prend ses caractères dans les polices du système (Bodoni 72 pour les noms, la police à chasse fixe du système pour les étiquettes).
 
 Si vous avez d'autres fichiers à vous, `originaux/` les accueille :

@@ -18,7 +18,7 @@ Outside the window: a card when the device connects, the menu bar panel, and not
 
 ![Connection card, menu bar panel and notices](docs/presentation-barre-des-menus.png)
 
-These pictures are made from the app itself by `tools/make-screens.sh`, with the public build: the device is drawn in dots. Installed with `tools/install.sh`, the app shows the real product pictures.
+These pictures are made from the app itself by `tools/make-screens.sh`, as you get it after `tools/install.sh`.
 
 ## Install
 
@@ -118,7 +118,7 @@ produces `.build/SimpleNothing-<version>.zip`: the app alone, with no Nothing pi
 Device pictures and fonts belong to Nothing (and to Lineto for Lettera Mono): they are not in the repository.
 
 - **Pictures**: `tools/install.sh` downloads them once from the public [Ear (web)](https://github.com/radiance-project/ear-web) repository into `originaux/ear-web/`, which git ignores. `NOTHING_SANS_IMAGES=1 tools/install.sh` skips that.
-- **Without pictures**, as in the screenshots above, the app draws the device and the large numbers itself, as dot matrices.
+- **Without pictures**, the app draws the device itself as a dot matrix, like the large numbers.
 - **Fonts**: the app uses system fonts (Bodoni 72 for names, the system monospaced font for labels).
 
 If you have other files of your own, `originaux/` takes them:
