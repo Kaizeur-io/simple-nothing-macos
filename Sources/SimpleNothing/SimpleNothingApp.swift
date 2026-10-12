@@ -86,6 +86,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if Launch.arguments.contains("--dark") { NSApp.appearance = NSAppearance(named: .darkAqua) }
         if Launch.arguments.contains("--light") { NSApp.appearance = NSAppearance(named: .aqua) }
         UserDefaults.standard.register(defaults: ["shortcutEnabled": true, "arrivalCard": true])
+        // Une seule copie de l'app peut tenir le canal de l'appareil : une seconde se battrait avec la première.
+        // Celle qui arrive en second demande à la première de se montrer, puis s'efface.
+        let showRequest = Notification.Name((Bundle.main.bundleIdentifier ?? "simple-nothing") + ".show")
+        if !Launch.isDemo, let id = Bundle.main.bundleIdentifier,
+           NSRunningApplication.runningApplications(withBundleIdentifier: id).contains(where: { $0 != .current }) {
+            if let path = Launch.path("--verify") {
+                try? "Une autre copie de l'app est ouverte et tient déjà l'appareil : quittez-la, puis relancez l'essai.\n".write(toFile: path, atomically: true, encoding: .utf8)
+            } else {
+                DistributedNotificationCenter.default().postNotificationName(showRequest, object: nil, userInfo: nil, deliverImmediately: true)
+            }
+            exit(0)
+        }
+        if !Launch.isDemo {
+            DistributedNotificationCenter.default().addObserver(forName: showRequest, object: nil, queue: .main) { _ in Self.showMainWindow() }
+            Journal.note("lancement")
+        }
         Self.headset.onArrival = {
             // Fenêtre déjà sous les yeux : elle montre la même chose, la carte ferait doublon.
             let windowInFront = NSApp.isActive && Self.mainWindow?.isVisible == true

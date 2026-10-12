@@ -87,6 +87,7 @@ produces `.build/SimpleNothing-<version>.zip`: the app alone, with no Nothing pi
 - What the device sends is treated as untrusted: lengths are checked, oversized or inconsistent frames are dropped.
 - Local builds are signed without a certificate, with an identity pinned to the app's identifier so that macOS keeps the Bluetooth permission from one build to the next. A local app impersonating that identifier would inherit the permission: acceptable on your own machine, to be replaced by a real signature for wide distribution.
 - The app is not sandboxed.
+- It keeps a short connection log in `~/Library/Logs/Simple Nothing.log` (timings, failures, freezes), with no serial number or address in it. It never leaves the Mac; attach it to a bug report if a connection misbehaves.
 
 ## What stays out of the repository
 
@@ -107,7 +108,7 @@ If you have other files of your own, `originaux/` takes them:
 ## Roadmap
 
 1. Confirm the remaining writes (dual connection, bass enhancement).
-2. Complete the app: configurable shortcut, pairing a device that has never been connected to the Mac.
+2. Complete the app: bass enhancement, find my device, low-battery notice, left / right / case battery for earbuds, configurable shortcut, pairing a device that has never been connected to the Mac.
 3. Distribution: a downloadable archive, signed and notarised, to install without building.
 4. Extend to other models, whose capabilities differ.
 

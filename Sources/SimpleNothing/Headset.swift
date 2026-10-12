@@ -53,6 +53,9 @@ final class Headset: NSObject, ObservableObject {
     /// macOS signale aussi, à l'inscription, les appareils déjà reliés : ceux-là ne sont pas des arrivées.
     private var watchingArrivals = false
     private var dualPages = 0
+    /// Tentatives d'ouverture du canal restées sans succès : chacune attend deux fois plus que la précédente.
+    private var failures = 0
+    private var opening: Date?
     private let isDemo: Bool
 
     init(demo: Bool = false) {
@@ -71,7 +74,8 @@ final class Headset: NSObject, ObservableObject {
             self.connectWatch = IOBluetoothDevice.register(forConnectNotifications: self, selector: #selector(self.deviceConnected(_:device:)))
             self.attach()
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in self?.watchingArrivals = true }
-            self.poll = Timer.scheduledTimer(withTimeInterval: 120, repeats: true) { [weak self] _ in self?.link?.send(Read.battery.rawValue) }
+            // L'appareil annonce de lui-même sa batterie quand elle change : cette relecture n'est qu'un filet.
+            self.poll = Timer.scheduledTimer(withTimeInterval: 900, repeats: true) { [weak self] _ in self?.link?.send(Read.battery.rawValue) }
         }
     }
 
@@ -150,14 +154,29 @@ final class Headset: NSObject, ObservableObject {
         }
         let link = Link(device: device)
         link.onOpen = { [weak self] in
-            self?.status = .connected
+            guard let self else { return }
+            Journal.note(String(format: "canal ouvert en %.1f s", Date().timeIntervalSince(self.opening ?? Date())))
+            self.status = .connected
             Read.allCases.forEach { link.send($0.rawValue) }
-            self?.requestDualDevices()
+            self.requestDualDevices()
         }
         link.onFrame = { [weak self] frame in self?.receive(frame) }
-        link.onClose = { [weak self] in self?.detach(retry: device.isConnected()) }
-        guard link.open() else { return }
+        link.onClose = { [weak self] in
+            Journal.note("canal fermé")
+            self?.detach(retry: device.isConnected())
+        }
+        opening = Date()
+        guard link.open() else {
+            Journal.note("ouverture du canal refusée")
+            return retryLater()
+        }
         self.link = link
+        // Une ouverture qui ne répond jamais ne doit pas laisser l'app sur « connexion… » indéfiniment.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 15) { [weak self, weak link] in
+            guard let self, let link, self.link === link, self.status != .connected else { return }
+            Journal.note("ouverture du canal sans réponse")
+            self.detach(retry: device.isConnected())
+        }
         name = device.name ?? ""
         UserDefaults.standard.set(name, forKey: "lastDevice")
         address = (device.addressString ?? "").uppercased().replacingOccurrences(of: "-", with: ":")
@@ -176,9 +195,11 @@ final class Headset: NSObject, ObservableObject {
             dualPages += 1
             link?.send(Query.dualDevices, [UInt8(state.dualDevices.count & 0xFF)])
         }
+        failures = 0
         if frame.command == Push.dualDevice { requestDualDevices() }
         if announceArrival, state.mainBattery != nil {
             announceArrival = false
+            Journal.note("état reçu, carte de connexion")
             onArrival?()
         }
     }
@@ -196,16 +217,37 @@ final class Headset: NSObject, ObservableObject {
         disconnectWatch = nil
         status = .absent
         state = DeviceState()
-        if retry { DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in self?.attach() } }
+        if retry { retryLater() }
+    }
+
+    /// Nouvel essai après un échec, de plus en plus espacé (3, 6, 12… secondes), puis on renonce
+    /// jusqu'à la prochaine connexion : insister occuperait la radio Bluetooth pour rien.
+    private func retryLater() {
+        guard failures < 6 else { return Journal.note("abandon après \(failures) essais") }
+        let delay = min(60, 3 * pow(2, Double(failures)))
+        failures += 1
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in self?.attach() }
     }
 
     @objc private func deviceConnected(_ notification: IOBluetoothUserNotification, device: IOBluetoothDevice) {
-        // L'appareil met un instant à ouvrir son service après la connexion audio.
-        if link == nil, watchingArrivals { announceArrival = true }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in self?.attach() }
+        guard link == nil, device.getServiceRecord(for: nothingService) != nil else { return }
+        // Au lancement, macOS rejoue les connexions déjà établies : rien de neuf, un simple rattrapage suffit.
+        guard watchingArrivals else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4) { [weak self] in self?.attach() }
+            return
+        }
+        // On laisse macOS finir d'installer la liaison audio avant d'ouvrir notre canal : pendant ces
+        // quelques secondes la radio Bluetooth est très sollicitée, et une souris ou un clavier
+        // Bluetooth s'en ressentent déjà sans nous.
+        Journal.note("appareil relié, ouverture du canal dans 4 s")
+        Journal.watchMainThread(for: 30)
+        failures = 0
+        announceArrival = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4) { [weak self] in self?.attach() }
     }
 
     @objc private func deviceDisconnected(_ notification: IOBluetoothUserNotification, device: IOBluetoothDevice) {
+        Journal.note("appareil parti")
         detach(retry: false)
     }
 

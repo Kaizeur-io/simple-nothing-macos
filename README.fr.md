@@ -91,6 +91,7 @@ produit `.build/SimpleNothing-<version>.zip` : l'app seule, sans photo ni police
 - Ce que l'appareil envoie est traité comme non fiable : longueurs vérifiées, trames trop longues ou incohérentes écartées.
 - Les constructions locales sont signées sans certificat, avec une identité fixée sur l'identifiant de l'app pour que macOS garde l'accord Bluetooth d'une compilation à l'autre. Une app locale qui usurperait cet identifiant hériterait de cet accord : acceptable sur sa propre machine, à remplacer par une vraie signature pour une diffusion large.
 - L'app n'est pas en bac à sable.
+- Elle tient un court journal des connexions dans `~/Library/Logs/Simple Nothing.log` (délais, échecs, blocages), sans numéro de série ni adresse. Il ne quitte jamais le Mac ; joignez-le à un rapport de bug si une connexion se passe mal.
 
 ## Voir les maquettes
 
@@ -139,7 +140,7 @@ La sonde n'envoie que des lectures. macOS demande l'autorisation Bluetooth au pr
 ## Suite prévue
 
 1. Confirmer les écritures restantes (double connexion, renfort des basses).
-2. Compléter l'application : choix du raccourci, appairage d'un appareil jamais relié au Mac.
+2. Compléter l'application : renfort des basses, localisation de l'appareil, alerte de batterie faible, batterie gauche / droite / boîtier des écouteurs, choix du raccourci, appairage d'un appareil jamais relié au Mac.
 3. Distribution : une archive téléchargeable, signée et notarisée, pour installer sans compiler.
 4. Étendre aux autres modèles, dont les capacités diffèrent.
 
