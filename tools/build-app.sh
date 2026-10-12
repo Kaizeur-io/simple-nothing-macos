@@ -28,10 +28,10 @@ cp -R Sources/SimpleNothing/Traductions/*.lproj "$res/"
 # Ce qui appartient à Nothing (images, polices) reste hors du dépôt. L'app s'en sert s'il est là,
 # et montre sinon des pictogrammes et des polices du système.
 # NOTHING_PUBLIC=1 construit la version à diffuser, sans rien de tout cela.
-# NOTHING_PHOTOS_SEULES=1 construit ce qu'obtient quelqu'un qui installe depuis le dépôt : les photos
-# téléchargées par tools/fetch-images.sh, mais ni vos polices ni vos autres images.
+# NOTHING_SANS_POLICES=1 garde les photos mais pas vos polices : c'est l'app des visuels du README,
+# avec les polices du système qu'obtient quelqu'un qui installe depuis le dépôt.
 if [ -z "$NOTHING_PUBLIC" ]; then
-  if [ -z "$NOTHING_PHOTOS_SEULES" ]; then cp originaux/polices/*.otf "$res/" 2>/dev/null || true; fi
+  if [ -z "$NOTHING_SANS_POLICES" ]; then cp originaux/polices/*.otf "$res/" 2>/dev/null || true; fi
   # Vues de face : <modèle>_<couleur>.webp devient device-<MODÈLE>-<couleur>.png. La conversion est
   # gardée dans .build/images pour ne pas la refaire à chaque construction.
   mkdir -p .build/images
@@ -47,7 +47,7 @@ if [ -z "$NOTHING_PUBLIC" ]; then
   # Vues de trois quarts du CMF Headphone Pro, fabriquées par tools/build-assets.swift à partir de vos propres sources.
   for pair in dark-grey:black light-grey:white light-green:green; do
     src="maquette/assets/products/cmf-headphone-pro-${pair%%:*}.png"
-    if [ -f "$src" ] && [ -z "$NOTHING_PHOTOS_SEULES" ]; then cp "$src" "$res/device-B175-${pair##*:}-34.png"; fi
+    if [ -f "$src" ]; then cp "$src" "$res/device-B175-${pair##*:}-34.png"; fi
   done
 fi
 

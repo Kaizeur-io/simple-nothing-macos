@@ -18,7 +18,7 @@ Outside the window: a card when the device connects, the menu bar panel, and not
 
 ![Connection card, menu bar panel and notices](docs/presentation-barre-des-menus.png)
 
-These pictures are made from the app itself by `tools/make-screens.sh`, as you get it after `tools/install.sh`.
+These pictures are made from the app itself by `tools/make-screens.sh`. The three-quarter view of the headset comes from my own files; installed from the repository, the app shows the front view in its place.
 
 ## Install
 

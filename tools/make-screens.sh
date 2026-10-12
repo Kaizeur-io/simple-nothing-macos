@@ -3,8 +3,7 @@
 # puis les compose sur un fond uni (tools/compose-screens.swift). Le fichier x.png est au format
 # 16:9 pour les réseaux.
 #
-#   tools/make-screens.sh                 → docs/, avec l'app telle que l'obtient quelqu'un qui installe depuis
-#                                           le dépôt : photos des appareils, polices du système
+#   tools/make-screens.sh                 → docs/, avec les photos des appareils et les polices du système
 #   tools/make-screens.sh <dossier>       → même chose ailleurs
 #   NOTHING_PUBLIC=1 tools/make-screens.sh   → sans aucune photo : l'appareil est dessiné en points
 #   NOTHING_COMPLET=1 tools/make-screens.sh originaux/presentation
@@ -14,7 +13,7 @@ cd "$(dirname "$0")/.."
 out="${1:-docs}"
 shots=".build/captures"
 app=".build/Simple Nothing.app"
-if [ -n "$NOTHING_COMPLET" ]; then tools/build-app.sh >/dev/null; elif [ -z "$NOTHING_PUBLIC" ]; then NOTHING_PHOTOS_SEULES=1 tools/build-app.sh >/dev/null; else tools/build-app.sh >/dev/null; fi
+if [ -n "$NOTHING_COMPLET" ]; then tools/build-app.sh >/dev/null; elif [ -z "$NOTHING_PUBLIC" ]; then NOTHING_SANS_POLICES=1 tools/build-app.sh >/dev/null; else tools/build-app.sh >/dev/null; fi
 rm -rf "$shots" && mkdir -p "$shots"
 export NOTHING_PWD="$PWD"
 shot() { open -n -W "$app" --args --demo --demo-battery 82 "$@"; }

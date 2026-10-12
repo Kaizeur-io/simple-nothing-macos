@@ -18,7 +18,7 @@ Hors de la fenêtre : une carte quand l'appareil se connecte, le panneau de la b
 
 ![Carte de connexion, panneau de la barre des menus et confirmations](docs/presentation-barre-des-menus.png)
 
-Ces visuels sont fabriqués à partir de l'app elle-même par `tools/make-screens.sh`, telle qu'on l'obtient après `tools/install.sh`.
+Ces visuels sont fabriqués à partir de l'app elle-même par `tools/make-screens.sh`. La vue de trois quarts du casque vient de mes propres fichiers ; installée depuis le dépôt, l'app montre la vue de face à sa place.
 
 ## Installation
 
