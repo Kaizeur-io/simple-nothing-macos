@@ -156,3 +156,5 @@
 "Déconnecter" = "Disconnect";
 "L'appareil redémarre quand on change ce réglage" = "The device restarts when this setting changes";
 \n\n/* Apparence, gestes des écouteurs */\n"Apparence" = "Appearance";\n"Clair" = "Light";\n"Sombre" = "Dark";\n"Appuyez deux fois" = "Press twice";\n"Appuyez trois fois" = "Press three times";\n"Appuyez deux fois et maintenez" = "Press twice and hold";\n"Tournez" = "Rotate";\n"Écouteur gauche" = "Left earbud";\n"Écouteur droit" = "Right earbud";\n"Lecture / pause" = "Play / pause";\n"Piste précédente" = "Previous track";\n"Piste suivante" = "Next track";\n"Volume +" = "Volume up";\n"Volume −" = "Volume down";\n"Déclencheur photo" = "Camera shutter";\n
+"Appareil introuvable : vérifiez qu'il est allumé et à portée." = "Device not found: check that it is on and in range.";
+"Appareil déconnecté. Allumez-le, puis cliquez sur Connecter." = "Device disconnected. Turn it on, then click Connect.";

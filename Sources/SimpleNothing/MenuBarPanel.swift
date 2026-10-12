@@ -55,10 +55,19 @@ struct MenuBarPanel: View {
                 VStack(alignment: .leading, spacing: 12) {
                     Text(tr(headset.hint))
                         .font(.system(size: 12)).foregroundStyle(Color.nMuted).fixedSize(horizontal: false, vertical: true)
-                    Button {
-                        NSWorkspace.shared.open(headset.settingsURL)
-                    } label: {
-                        Caps(headset.status == .unauthorized ? "Ouvrir les réglages" : "Réglages Bluetooth", size: 9, color: .nOnText).padding(.horizontal, 16).frame(height: 30).background(Color.nText, in: Capsule())
+                    HStack(spacing: 8) {
+                        if headset.canConnect {
+                            Button(action: headset.connect) {
+                                Caps("Connecter", size: 9, color: .nOnText).padding(.horizontal, 16).frame(height: 30).background(Color.nText, in: Capsule())
+                            }
+                        }
+                        Button {
+                            NSWorkspace.shared.open(headset.settingsURL)
+                        } label: {
+                            let main = !headset.canConnect
+                            Caps(headset.status == .unauthorized ? "Ouvrir les réglages" : "Réglages Bluetooth", size: 9, color: main ? .nOnText : .nText)
+                                .padding(.horizontal, 16).frame(height: 30).background(main ? Color.nText : Color.nWell, in: Capsule())
+                        }
                     }
                     .buttonStyle(.plain)
                 }
@@ -75,6 +84,12 @@ struct MenuBarPanel: View {
                 }
                 .keyboardShortcut("o")
                 Spacer()
+                if connected {
+                    Button(action: headset.disconnect) {
+                        Text(tr("Déconnecter")).font(.system(size: 12)).foregroundStyle(Color.nMuted).contentShape(Rectangle())
+                    }
+                    .padding(.trailing, 12)
+                }
                 Button { NSApp.terminate(nil) } label: {
                     Text(tr("Quitter")).font(.system(size: 12)).foregroundStyle(Color.nMuted).contentShape(Rectangle())
                 }

@@ -25,7 +25,10 @@ final class Headset: NSObject, ObservableObject {
         switch status {
         case .unauthorized: "Bluetooth n'est pas autorisé pour cette app : Réglages › Confidentialité et sécurité › Bluetooth."
         case .connecting: "Connexion en cours…"
-        default: "Allumez votre appareil et reliez-le au Mac dans Réglages › Bluetooth."
+        default:
+            connectFailed ? "Appareil introuvable : vérifiez qu'il est allumé et à portée."
+                : canConnect ? "Appareil déconnecté. Allumez-le, puis cliquez sur Connecter."
+                : "Allumez votre appareil et reliez-le au Mac dans Réglages › Bluetooth."
         }
     }
 
@@ -42,6 +45,9 @@ final class Headset: NSObject, ObservableObject {
     var settingsURL: URL {
         URL(string: status == .unauthorized ? "x-apple.systempreferences:com.apple.preference.security?Privacy_Bluetooth" : "x-apple.systempreferences:com.apple.BluetoothSettings")!
     }
+
+    /// Un appareil déjà jumelé au Mac est connu : on peut proposer de s'y relier depuis l'app.
+    var canConnect: Bool { status == .absent && UserDefaults.standard.string(forKey: "lastDevice") != nil }
 
     /// Toutes les trames reçues, pour le diagnostic.
     var onFrame: ((Frame) -> Void)?
@@ -63,6 +69,8 @@ final class Headset: NSObject, ObservableObject {
     private var failures = 0
     private var opening: Date?
     private var lowBatteryTold = false
+    /// La dernière demande de connexion faite depuis l'app n'a pas abouti.
+    private var connectFailed = false
     private var ringStop: DispatchWorkItem?
     private let isDemo: Bool
 
@@ -95,6 +103,44 @@ final class Headset: NSObject, ObservableObject {
         ring(nil)
         link?.close()
         link = nil
+    }
+
+    // MARK: Connexion au Mac
+
+    /// Relie au Mac l'appareil jumelé, comme le ferait le menu Bluetooth de macOS. On vise le dernier
+    /// appareil vu ; la suite (canal, état, carte) passe par le chemin habituel des arrivées.
+    func connect() {
+        guard canConnect, !isDemo else { return }
+        let paired = ((IOBluetoothDevice.pairedDevices() as? [IOBluetoothDevice]) ?? []).filter { $0.getServiceRecord(for: nothingService) != nil }
+        let last = UserDefaults.standard.string(forKey: "lastDevice")
+        guard let device = paired.first(where: { $0.name == last }) ?? paired.first else { return failConnect() }
+        Journal.note("connexion demandée depuis l'app")
+        connectFailed = false
+        status = .connecting
+        if device.isConnected() { return attach() }
+        if device.openConnection(self) != kIOReturnSuccess { failConnect() }
+    }
+
+    @objc private func connectionComplete(_ device: IOBluetoothDevice, status result: IOReturn) {
+        guard result == kIOReturnSuccess else { return failConnect() }
+        // Filet : la notification d'arrivée ouvre normalement le canal d'elle-même.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 6) { [weak self] in self?.attach() }
+    }
+
+    private func failConnect() {
+        Journal.note("connexion demandée : appareil introuvable")
+        guard link == nil else { return }
+        connectFailed = true
+        status = .absent
+    }
+
+    /// Détache l'appareil du Mac : notre canal d'abord, puis la liaison Bluetooth elle-même.
+    func disconnect() {
+        guard let device = link?.device else { return }
+        Journal.note("déconnexion demandée depuis l'app")
+        ring(nil)
+        detach(retry: false)
+        device.closeConnection()
     }
 
     // MARK: Réglages
@@ -198,6 +244,7 @@ final class Headset: NSObject, ObservableObject {
         let paired = (IOBluetoothDevice.pairedDevices() as? [IOBluetoothDevice]) ?? []
         guard let device = paired.first(where: { $0.isConnected() && $0.getServiceRecord(for: nothingService) != nil }) else {
             announceArrival = false
+            if status == .connecting { status = .absent }
             return
         }
         let link = Link(device: device)
@@ -205,6 +252,7 @@ final class Headset: NSObject, ObservableObject {
             guard let self else { return }
             Journal.note(String(format: "canal ouvert en %.1f s", Date().timeIntervalSince(self.opening ?? Date())))
             self.status = .connected
+            self.connectFailed = false
             // On ne demande pas ce que le modèle n'a pas.
             let caps = self.capabilities
             let skipped = [caps.wearDetection ? nil : Read.wearDetection, caps.bassSteps.isEmpty ? Read.bass : nil].compactMap { $0 }
@@ -333,6 +381,7 @@ final class Headset: NSObject, ObservableObject {
         }
         if let level = capabilities.bassSteps.dropFirst().first { state.apply(Frame(command: 0x404E, payload: [0x01, level])) }
         if capabilities.wearDetection { state.apply(Frame(command: 0x400E, payload: [0x00, 0x00, 0x01])) }
+        if Launch.arguments.contains("--demo-absent") { (status, state) = (.absent, DeviceState()) }
         if let percent = Launch.value("--demo-battery").flatMap(UInt8.init) { state.apply(Frame(command: 0x4007, payload: [0x01, 0x06, percent])) }
         if CommandLine.arguments.contains("--demo-custom") {
             state.preset = .custom

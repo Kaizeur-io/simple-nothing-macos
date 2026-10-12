@@ -7,6 +7,7 @@ import SwiftUI
 ///   --demo                     état factice, aucun accès Bluetooth
 ///   --demo-custom              avec --demo : égaliseur sur « Personnalisé »
 ///   --demo-name <nom>          avec --demo : nom Bluetooth de l'appareil factice, pour voir un autre modèle
+///   --demo-absent              avec --demo : aucun appareil relié
 ///   --demo-battery <niveau>    avec --demo : niveau de batterie du casque factice
 ///   --section <nom>            listen, controls, link, device ou app
 ///   --dark | --light           force l'apparence

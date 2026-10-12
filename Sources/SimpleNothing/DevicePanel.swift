@@ -16,6 +16,12 @@ struct DevicePanel: View {
                 .lineLimit(1).minimumScaleFactor(0.7).padding(.horizontal, 14)
             battery.padding(.top, 12).frame(height: 52, alignment: .top)
             Spacer(minLength: 10)
+            // Relier ou détacher l'appareil sans passer par le menu Bluetooth de macOS.
+            if connected {
+                PillButton(label: "Déconnecter", action: headset.disconnect).padding(.bottom, 14)
+            } else if headset.canConnect {
+                PillButton(label: "Connecter", action: headset.connect).padding(.bottom, 14)
+            }
             footer
         }
         .padding(.bottom, 14).frame(width: 250).frame(maxHeight: .infinity)

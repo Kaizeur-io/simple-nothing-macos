@@ -27,6 +27,7 @@ Using a coding assistant? Hand it the repository and ask it to install: [AGENTS.
 - Finds the Nothing or CMF device connected to the Mac and shows its real state: battery, noise control, equaliser, spatial audio, low lag mode, button mapping, dual connection, codec, firmware.
 - Changes those settings. Every change is read back from the device, so the screen shows what the device actually kept.
 - Lives in the menu bar: a panel with the essentials, a card when the device connects, a low-battery notice, and a keyboard shortcut (⌃⌥A unless you change it) to switch noise mode from any app.
+- Connects or disconnects the device from the Mac without opening Bluetooth settings.
 - Rings the device to find it, and connects or disconnects the other devices of the dual connection.
 - Only offers what each model has: bass enhancement, wear detection, spatial audio modes and left / right / case battery appear where the model supports them.
 - Available in English, French and Spanish, in light or dark appearance.
