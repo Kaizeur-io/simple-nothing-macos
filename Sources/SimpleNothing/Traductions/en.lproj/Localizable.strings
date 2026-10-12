@@ -73,8 +73,6 @@
 "Curseur" = "Slider";
 "Molette de défilement" = "Roller";
 "Alterne entre les modes de bruit" = "Cycles through noise control modes";
-"Gestes fixes" = "Fixed gestures";
-"1 appui : lecture/pause · 2 : suivant · 3 : précédent · défilement : volume" = "1 press: play/pause · 2: next · 3: previous · scroll: volume";
 "Assistant vocal" = "Voice assistant";
 "Contrôle du bruit" = "Noise control";
 "Micro activé/coupé" = "Mic on/off";
@@ -126,7 +124,6 @@
 "Fixe" = "Fixed";
 "Renfort des basses" = "Bass enhancement";
 "Niveau %d" = "Level %d";
-"Au quotidien" = "Everyday";
 "Faire sonner l'appareil" = "Ring the device";
 "Son fort : retirez d'abord l'appareil de vos oreilles" = "Loud sound: take the device off your ears first";
 "Sonner" = "Ring";
@@ -157,4 +154,13 @@
 "L'appareil redémarre quand on change ce réglage" = "The device restarts when this setting changes";
 \n\n/* Apparence, gestes des écouteurs */\n"Apparence" = "Appearance";\n"Clair" = "Light";\n"Sombre" = "Dark";\n"Appuyez deux fois" = "Press twice";\n"Appuyez trois fois" = "Press three times";\n"Appuyez deux fois et maintenez" = "Press twice and hold";\n"Tournez" = "Rotate";\n"Écouteur gauche" = "Left earbud";\n"Écouteur droit" = "Right earbud";\n"Lecture / pause" = "Play / pause";\n"Piste précédente" = "Previous track";\n"Piste suivante" = "Next track";\n"Volume +" = "Volume up";\n"Volume −" = "Volume down";\n"Déclencheur photo" = "Camera shutter";\n
 "Appareil introuvable : vérifiez qu'il est allumé et à portée." = "Device not found: check that it is on and in range.";
-"Appareil déconnecté. Allumez-le, puis cliquez sur Connecter." = "Device disconnected. Turn it on, then click Connect.";
+
+/* Revue d'interface */
+"Aucun appareil connecté" = "No device connected";
+"Bluetooth non autorisé" = "Bluetooth not allowed";
+"Actions" = "Actions";
+"Connexion à ce Mac" = "Connection to this Mac";
+"L'appareil reste jumelé : il se reconnecte d'un clic" = "The device stays paired: one click reconnects it";
+"Réglages…" = "Settings…";
+"Les autres gestes de la molette ne se règlent pas : un appui pour lecture ou pause, deux pour le titre suivant, trois pour le précédent, et le défilement pour le volume." = "The roller's other gestures cannot be changed: press once to play or pause, twice for the next track, three times for the previous one, and scroll for volume.";
+"Allumez votre appareil, puis cliquez sur Connecter." = "Turn your device on, then click Connect.";

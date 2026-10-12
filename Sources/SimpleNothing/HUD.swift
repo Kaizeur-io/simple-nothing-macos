@@ -23,7 +23,8 @@ final class HUD {
         let frame = CGRect(x: screen.visibleFrame.maxX - size.width + Self.margin - 14, y: screen.visibleFrame.maxY - size.height + Self.margin - 10,
                            width: size.width, height: size.height)
         if !panel.isVisible {
-            panel.setFrame(frame.offsetBy(dx: 0, dy: 18), display: false)
+            // Avec « Réduire les animations », la carte apparaît en fondu, sans glisser.
+            panel.setFrame(frame.offsetBy(dx: 0, dy: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion ? 0 : 18), display: false)
             panel.alphaValue = 0
             panel.orderFrontRegardless()
         }

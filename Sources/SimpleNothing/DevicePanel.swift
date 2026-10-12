@@ -14,14 +14,9 @@ struct DevicePanel: View {
             Spacer(minLength: 16)
             Text(headset.name.isEmpty ? tr("Aucun appareil") : headset.name).font(.nSerif(23)).foregroundStyle(Color.nText)
                 .lineLimit(1).minimumScaleFactor(0.7).padding(.horizontal, 14)
-            battery.padding(.top, 12).frame(height: 52, alignment: .top)
+            // Hauteur réservée même sans batterie à montrer : le nom ne bouge pas d'un état à l'autre.
+            ZStack(alignment: .top) { battery }.padding(.top, 12).frame(height: 52, alignment: .top)
             Spacer(minLength: 10)
-            // Relier ou détacher l'appareil sans passer par le menu Bluetooth de macOS.
-            if connected {
-                PillButton(label: "Déconnecter", action: headset.disconnect).padding(.bottom, 14)
-            } else if headset.canConnect {
-                PillButton(label: "Connecter", action: headset.connect).padding(.bottom, 14)
-            }
             footer
         }
         .padding(.bottom, 14).frame(width: 250).frame(maxHeight: .infinity)
@@ -44,9 +39,6 @@ struct DevicePanel: View {
                 Text(tr("%d %%", level.percent) + (level.charging ? " · " + tr("en charge") : "")).font(.nMono(11)).foregroundStyle(Color.nText)
             }
             .accessibilityElement(children: .ignore).accessibilityLabel(tr("Batterie %d %%", level.percent))
-        } else if !connected {
-            Text(tr(headset.hint)).font(.system(size: 11)).foregroundStyle(Color.nMuted).multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true).padding(.horizontal, 22)
         }
     }
 
@@ -55,7 +47,7 @@ struct DevicePanel: View {
             Circle().fill(connected ? Color.nGreen : Color.nMuted).frame(width: 5, height: 5)
             Caps(headset.statusLabel)
             Spacer()
-            if connected { Caps([headset.state.codec?.name, headset.state.firmware].compactMap { $0 }.joined(separator: " · ")) }
+            if connected, let codec = headset.state.codec { Caps(codec.name) }
         }
         .padding(.horizontal, 16)
     }

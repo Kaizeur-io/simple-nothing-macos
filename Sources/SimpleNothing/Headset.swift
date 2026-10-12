@@ -27,7 +27,7 @@ final class Headset: NSObject, ObservableObject {
         case .connecting: "Connexion en cours…"
         default:
             connectFailed ? "Appareil introuvable : vérifiez qu'il est allumé et à portée."
-                : canConnect ? "Appareil déconnecté. Allumez-le, puis cliquez sur Connecter."
+                : canConnect ? "Allumez votre appareil, puis cliquez sur Connecter."
                 : "Allumez votre appareil et reliez-le au Mac dans Réglages › Bluetooth."
         }
     }

@@ -200,6 +200,9 @@ struct SimpleNothingApp: App {
         .windowStyle(.hiddenTitleBar).windowResizability(.contentSize)
         .commands {
             CommandGroup(replacing: .newItem) {}
+            CommandGroup(replacing: .appSettings) {
+                Button(tr("Réglages…")) { section = .app; AppDelegate.showMainWindow() }.keyboardShortcut(",")
+            }
             CommandMenu(tr("Présentation")) {
                 ForEach(Array(Pane.allCases.enumerated()), id: \.element) { index, item in
                     Button(tr(item.label)) { section = item }.keyboardShortcut(KeyEquivalent(Character("\(index + 1)")))

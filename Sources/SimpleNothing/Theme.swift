@@ -16,6 +16,8 @@ extension Color {
     static let nText = adaptive(0x1B1B1B, 0xFFFFFF)
     static let nMuted = adaptive(0x6E6E6E, 0x9C9C9C)
     static let nTrack = adaptive(0xE4E4E4, 0x343434)
+    /// Interrupteur éteint : plus marqué que les filets, pour rester visible sur une carte claire.
+    static let nSwitchOff = adaptive(0xC9C9C9, 0x4A4A4A)
     static let nOnText = adaptive(0xFFFFFF, 0x000000)
     static let nBlob = adaptive(0xF6F6F6, 0x333333)
     static let nRed = adaptive(0xD71921, 0xD71921)
@@ -145,15 +147,16 @@ struct NothingToggle: ToggleStyle {
         Button { configuration.isOn.toggle() } label: {
             HStack(spacing: 12) {
                 configuration.label
-                Capsule().fill(configuration.isOn ? Color.nText : Color.nTrack).frame(width: 44, height: 26)
+                Capsule().fill(configuration.isOn ? Color.nText : Color.nSwitchOff).frame(width: 44, height: 26)
                     .overlay(alignment: configuration.isOn ? .trailing : .leading) {
                         Circle().fill(configuration.isOn ? Color.nOnText : .white).frame(width: 20, height: 20).padding(3)
+                            .shadow(color: .black.opacity(0.18), radius: 1.5, y: 0.5)
                     }
                     .animation(.easeOut(duration: 0.18), value: configuration.isOn)
             }
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain).accessibilityAddTraits(configuration.isOn ? .isSelected : [])
+        .buttonStyle(.plain).accessibilityAddTraits(.isToggle).accessibilityValue(tr(configuration.isOn ? "Activé" : "Désactivé"))
     }
 }
 
@@ -202,12 +205,14 @@ struct Row<Trailing: View>: View {
 struct PillButton: View {
     let label: String
     var isOn = false
+    /// L'action principale de l'écran : pastille pleine.
+    var prominent = false
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            Caps(label, size: 9, color: isOn ? .white : .nText).padding(.horizontal, 12).frame(height: 26)
-                .background(isOn ? Color.nRed : Color.nWell, in: Capsule()).contentShape(Capsule())
+            Caps(label, size: 9, color: isOn ? .white : prominent ? .nOnText : .nText).padding(.horizontal, prominent ? 16 : 12).frame(height: prominent ? 30 : 26)
+                .background(isOn ? Color.nRed : prominent ? Color.nText : Color.nWell, in: Capsule()).contentShape(Capsule())
         }
         .buttonStyle(.plain)
     }

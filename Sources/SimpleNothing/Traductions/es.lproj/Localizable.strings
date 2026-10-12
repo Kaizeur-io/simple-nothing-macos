@@ -74,8 +74,6 @@
 "Curseur" = "Deslizador";
 "Molette de défilement" = "Rueda";
 "Alterne entre les modes de bruit" = "Alterna entre los modos de ruido";
-"Gestes fixes" = "Gestos fijos";
-"1 appui : lecture/pause · 2 : suivant · 3 : précédent · défilement : volume" = "1 pulsación: reproducir/pausar · 2: siguiente · 3: anterior · giro: volumen";
 "Assistant vocal" = "Asistente de voz";
 "Contrôle du bruit" = "Control de ruido";
 "Micro activé/coupé" = "Micrófono sí/no";
@@ -127,7 +125,6 @@
 "Fixe" = "Fijo";
 "Renfort des basses" = "Refuerzo de graves";
 "Niveau %d" = "Nivel %d";
-"Au quotidien" = "Día a día";
 "Faire sonner l'appareil" = "Hacer sonar el dispositivo";
 "Son fort : retirez d'abord l'appareil de vos oreilles" = "Sonido fuerte: quítate antes el dispositivo de los oídos";
 "Sonner" = "Sonar";
@@ -158,4 +155,13 @@
 "L'appareil redémarre quand on change ce réglage" = "El dispositivo se reinicia al cambiar este ajuste";
 \n\n/* Apparence, gestes des écouteurs */\n"Apparence" = "Apariencia";\n"Clair" = "Claro";\n"Sombre" = "Oscuro";\n"Appuyez deux fois" = "Pulsa dos veces";\n"Appuyez trois fois" = "Pulsa tres veces";\n"Appuyez deux fois et maintenez" = "Pulsa dos veces y mantén";\n"Tournez" = "Gira";\n"Écouteur gauche" = "Auricular izquierdo";\n"Écouteur droit" = "Auricular derecho";\n"Lecture / pause" = "Reproducir / pausar";\n"Piste précédente" = "Pista anterior";\n"Piste suivante" = "Pista siguiente";\n"Volume +" = "Subir volumen";\n"Volume −" = "Bajar volumen";\n"Déclencheur photo" = "Disparador de cámara";\n
 "Appareil introuvable : vérifiez qu'il est allumé et à portée." = "Dispositivo no encontrado: comprueba que está encendido y cerca.";
-"Appareil déconnecté. Allumez-le, puis cliquez sur Connecter." = "Dispositivo desconectado. Enciéndelo y haz clic en Conectar.";
+
+/* Revue d'interface */
+"Aucun appareil connecté" = "Ningún dispositivo conectado";
+"Bluetooth non autorisé" = "Bluetooth no autorizado";
+"Actions" = "Acciones";
+"Connexion à ce Mac" = "Conexión con este Mac";
+"L'appareil reste jumelé : il se reconnecte d'un clic" = "El dispositivo sigue emparejado: se reconecta con un clic";
+"Réglages…" = "Ajustes…";
+"Les autres gestes de la molette ne se règlent pas : un appui pour lecture ou pause, deux pour le titre suivant, trois pour le précédent, et le défilement pour le volume." = "Los demás gestos de la rueda no se pueden cambiar: una pulsación para reproducir o pausar, dos para la pista siguiente, tres para la anterior, y gira para el volumen.";
+"Allumez votre appareil, puis cliquez sur Connecter." = "Enciende tu dispositivo y haz clic en Conectar.";

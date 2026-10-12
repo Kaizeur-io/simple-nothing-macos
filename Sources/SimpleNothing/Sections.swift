@@ -23,6 +23,7 @@ struct ListenSection: View {
     private var preset: Preset { headset.state.preset ?? .pop }
     private var spatial: SpatialMode { headset.state.spatial ?? .off }
     private var caps: Capabilities { headset.capabilities }
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// Courbe en cours de glissement, avant d'être envoyée.
     @State private var draft: CustomEQ?
@@ -112,7 +113,7 @@ struct ListenSection: View {
                     draft = done ? nil : curve
                     if done { headset.setCustomEQ(curve) }
                 })
-                .animation(.easeInOut(duration: 0.35), value: preset).padding(.vertical, -4)
+                .animation(reduceMotion ? nil : .easeInOut(duration: 0.35), value: preset).padding(.vertical, -4)
                 VStack(alignment: .leading, spacing: 14) {
                     CardHead(title: "Égaliseur", subtitle: preset == .custom ? "Personnalisé · déplacez les trois points" : preset.label)
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible())], spacing: 8) {
@@ -194,9 +195,9 @@ struct ControlsSection: View {
             SectionTitle("Molette de défilement")
             RowGroup {
                 Row(symbol: "hand.tap.fill", title: "Appuyez longuement", subtitle: "Alterne entre les modes de bruit") { menu(.rollerHold) }
-                Row(symbol: "dial.low", title: "Gestes fixes",
-                    subtitle: "1 appui : lecture/pause · 2 : suivant · 3 : précédent · défilement : volume") { EmptyView() }
             }
+            Text(tr("Les autres gestes de la molette ne se règlent pas : un appui pour lecture ou pause, deux pour le titre suivant, trois pour le précédent, et le défilement pour le volume."))
+                .font(.system(size: 11)).foregroundStyle(Color.nMuted).fixedSize(horizontal: false, vertical: true).padding(.horizontal, 4)
             Spacer(minLength: 0)
         }
     }
@@ -290,25 +291,26 @@ struct DeviceSection: View {
                 Row(title: "Adresse Bluetooth") { value(headset.address) }
                 Row(title: "Firmware") { value(headset.state.firmware ?? "–") }
             }
-            if !caps.ring.isEmpty || caps.wearDetection {
-                SectionTitle("Au quotidien")
-                RowGroup {
-                    if !caps.ring.isEmpty {
-                        Row(symbol: "bell.and.waves.left.and.right", title: "Faire sonner l'appareil",
-                            subtitle: "Son fort : retirez d'abord l'appareil de vos oreilles") {
-                            ForEach(caps.ring, id: \.self) { target in
-                                let isOn = headset.ringing == target
-                                PillButton(label: isOn ? "Arrêter" : target.label, isOn: isOn) {
-                                    if isOn { headset.ring(nil) } else { ringAsked = target }
-                                }
+            SectionTitle("Actions")
+            RowGroup {
+                if !caps.ring.isEmpty {
+                    Row(symbol: "bell.and.waves.left.and.right", title: "Faire sonner l'appareil",
+                        subtitle: "Son fort : retirez d'abord l'appareil de vos oreilles") {
+                        ForEach(caps.ring, id: \.self) { target in
+                            let isOn = headset.ringing == target
+                            PillButton(label: isOn ? "Arrêter" : target.label, isOn: isOn) {
+                                if isOn { headset.ring(nil) } else { ringAsked = target }
                             }
                         }
                     }
-                    if caps.wearDetection {
-                        ToggleRow(symbol: "pause.circle", title: "Détection de port", subtitle: "Met la lecture en pause quand vous retirez l'appareil",
-                                  isOn: headset.state.wearDetection ?? false, set: headset.setWearDetection)
-                            .padding(.horizontal, 16).frame(minHeight: 48)
-                    }
+                }
+                if caps.wearDetection {
+                    ToggleRow(symbol: "pause.circle", title: "Détection de port", subtitle: "Met la lecture en pause quand vous retirez l'appareil",
+                              isOn: headset.state.wearDetection ?? false, set: headset.setWearDetection)
+                        .padding(.horizontal, 16).frame(minHeight: 48)
+                }
+                Row(symbol: "personalhotspot.slash", title: "Connexion à ce Mac", subtitle: "L'appareil reste jumelé : il se reconnecte d'un clic") {
+                    PillButton(label: "Déconnecter", action: headset.disconnect)
                 }
             }
             if let model = headset.model, !model.verified {
