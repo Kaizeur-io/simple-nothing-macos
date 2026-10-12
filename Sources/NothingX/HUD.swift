@@ -79,7 +79,6 @@ private struct HUDCard<Content: View>: View {
 /// « Votre casque vient de se connecter », à la manière des AirPods.
 struct ArrivalCard: View {
     @ObservedObject var headset: Headset
-    @AppStorage("finish") private var finish = Finish.darkGrey
 
     var body: some View {
         HUDCard(radius: 26) {
@@ -88,14 +87,7 @@ struct ArrivalCard: View {
                     Circle().fill(Color.nGreen).frame(width: 6, height: 6)
                     Caps("Connecté", size: 10)
                 }
-                Group {
-                    if headset.model == .headphonePro, let image = finish.frontImage {
-                        Image(nsImage: image).resizable().interpolation(.high).scaledToFit()
-                    } else {
-                        DeviceGlyph(isHeadphones: headset.model?.isHeadphones != false).padding(.vertical, 16)
-                    }
-                }
-                .frame(height: 150).padding(.top, 14).padding(.bottom, 10)
+                DevicePicture(model: headset.shownModel).frame(height: 150).padding(.top, 14).padding(.bottom, 10)
                 Text(headset.name).font(.nSerif(25)).foregroundStyle(Color.nText).lineLimit(1).minimumScaleFactor(0.7)
                 if let level = headset.state.mainBattery {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {

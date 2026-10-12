@@ -179,7 +179,7 @@ struct LinkSection: View {
 
 struct DeviceSection: View {
     @ObservedObject var headset: Headset
-    @AppStorage("finish") private var finish = Finish.darkGrey
+    @ObservedObject private var art = DeviceArt.shared
     @AppStorage("shortcutEnabled") private var shortcutEnabled = true
     @AppStorage("arrivalCard") private var arrivalCard = true
     @State private var opensAtLogin = AppDelegate.opensAtLogin
@@ -190,16 +190,17 @@ struct DeviceSection: View {
             SectionTitle("Informations")
             RowGroup {
                 Row(title: "Modèle") { value(headset.model.map { "\($0.fullName) · \($0.id)" } ?? headset.name) }
-                if headset.model == .headphonePro {
+                if let model = headset.model, art.colours(for: model).count > 1 {
                     Row(title: "Couleur") {
                         HStack(spacing: 8) {
-                            ForEach(Finish.allCases, id: \.self) { item in
-                                Button { finish = item } label: {
-                                    Circle().fill(item.swatch).frame(width: 18, height: 18)
+                            ForEach(art.colours(for: model), id: \.self) { item in
+                                let isOn = art.colour(for: model) == item
+                                Button { art.choose(item, for: model) } label: {
+                                    Circle().fill(DeviceArt.swatch(item)).frame(width: 18, height: 18)
                                         .overlay { Circle().strokeBorder(Color.nTrack, lineWidth: 1) }
-                                        .padding(3).overlay { Circle().strokeBorder(finish == item ? Color.nText : .clear, lineWidth: 1.5) }
+                                        .padding(3).overlay { Circle().strokeBorder(isOn ? Color.nText : .clear, lineWidth: 1.5) }
                                 }
-                                .buttonStyle(.plain).accessibilityLabel(tr(item.label)).accessibilityAddTraits(finish == item ? .isSelected : [])
+                                .buttonStyle(.plain).accessibilityLabel(tr(DeviceArt.label(item))).accessibilityAddTraits(isOn ? .isSelected : [])
                             }
                         }
                     }

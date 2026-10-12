@@ -109,9 +109,15 @@
 "Couleur" = "Color";
 "N° de série" = "N.º de serie";
 "Adresse Bluetooth" = "Dirección Bluetooth";
-"Gris foncé" = "Gris oscuro";
-"Gris clair" = "Gris claro";
-"Vert clair" = "Verde claro";
+"Noir" = "Negro";
+"Blanc" = "Blanco";
+"Gris" = "Gris";
+"Argent" = "Plata";
+"Vert" = "Verde";
+"Bleu" = "Azul";
+"Orange" = "Naranja";
+"Jaune" = "Amarillo";
+"Rose" = "Rosa";
 "Ce modèle n'a pas encore été vérifié : certains réglages peuvent manquer." = "Este modelo aún no se ha verificado: pueden faltar algunos ajustes.";
 
 /* Barra de menús */

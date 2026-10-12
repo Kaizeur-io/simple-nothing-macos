@@ -6,6 +6,7 @@ import SwiftUI
 /// Options de lancement, pour les captures d'écran et les essais sans casque :
 ///   --demo                     état factice, aucun accès Bluetooth
 ///   --demo-custom              avec --demo : égaliseur sur « Personnalisé »
+///   --demo-name <nom>          avec --demo : nom Bluetooth de l'appareil factice, pour voir un autre modèle
 ///   --section <nom>            listen, controls, link ou device
 ///   --dark | --light           force l'apparence
 ///   --snapshot <fichier.png>   enregistre la fenêtre puis quitte

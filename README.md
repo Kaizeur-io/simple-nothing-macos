@@ -1,142 +1,123 @@
-# Nothing X pour Mac (projet personnel, non officiel)
+# nothing-mac (personal project, unofficial)
 
-Une application macOS pour régler les casques et écouteurs Nothing et CMF, que l'app officielle ne couvre que sur téléphone. Ce projet n'est ni affilié à Nothing Technology, ni soutenu par elle.
+English · [Français](README.fr.md)
 
-![La fenêtre de l'application](docs/apercu-fenetre.png)
+A macOS app to control Nothing and CMF headphones and earbuds, which the official app only supports on phones. This project is not affiliated with or endorsed by Nothing Technology.
 
-| Dans la barre des menus | À la connexion |
+![The app window](docs/apercu-fenetre.png)
+
+| In the menu bar | When the device connects |
 |---|---|
-| ![Panneau de la barre des menus](docs/apercu-barre-des-menus.png) | ![Carte de connexion](docs/apercu-carte.png) |
+| ![Menu bar panel](docs/apercu-barre-des-menus.png) | ![Connection card](docs/apercu-carte.png) |
 
-## Installation
+## Install
 
-Il faut macOS 14 ou plus récent et les outils en ligne de commande d'Apple (`xcode-select --install` s'ils manquent ; Xcode n'est pas nécessaire). Depuis le dossier du dépôt :
+You need macOS 14 or later and Apple's Command Line Tools (`xcode-select --install` if they are missing; full Xcode is not required). From the repository folder:
 
 ```sh
 tools/install.sh
 ```
 
-Le script compile l'app (environ une minute la première fois), la place dans Applications et l'ouvre. Il reste deux gestes : cliquer sur « Autoriser » quand macOS demande l'accès Bluetooth, et jumeler le casque ou les écouteurs au Mac dans Réglages Système › Bluetooth si ce n'est pas déjà fait.
+The script downloads the device pictures (about 20 MB, see below), builds the app (about a minute the first time), puts it in Applications and opens it. Two things are left to you: click "Allow" when macOS asks for Bluetooth access, and pair your headphones with the Mac in System Settings › Bluetooth if that is not done yet.
 
-Vous passez par un assistant de programmation ? Donnez-lui le dépôt et demandez-lui de l'installer : [AGENTS.md](AGENTS.md) lui dit quoi faire.
+Using a coding assistant? Hand it the repository and ask it to install: [AGENTS.md](AGENTS.md) tells it what to do.
 
-## Où en est le projet
+## What it does
 
-- **Maquettes interactives** : faites. Deux versions, jour et nuit, tout l'état y est simulé.
-- **Protocole** : la lecture fonctionne sur un CMF Headphone Pro (batterie, firmware, réduction du bruit, égaliseur, audio spatial, commandes, double connexion, codec). Voir [docs/protocole.md](docs/protocole.md). Les réglages aussi : mode de bruit, égaliseur (préréglages et courbe personnalisée), audio spatial, faible latence et commandes ont été écrits, relus et remis en place sur l'appareil.
-- **Application** : elle détecte l'appareil relié au Mac, affiche son état réel dans la fenêtre et dans la barre des menus, et envoie les réglages. Une carte s'affiche quand l'appareil se connecte, et ⌃⌥A change de mode de bruit depuis n'importe quelle app. Seul le CMF Headphone Pro a été vérifié.
+- Finds the Nothing or CMF device connected to the Mac and shows its real state: battery, noise control, equaliser, spatial audio, low lag mode, button mapping, dual connection, codec, firmware.
+- Changes those settings. Every change is read back from the device, so the screen shows what the device actually kept.
+- Lives in the menu bar: a panel with the essentials, a card when the device connects, and ⌃⌥A to switch noise mode from any app.
+- Available in English, French and Spanish.
 
-## Arborescence
+Only the CMF Headphone Pro has been verified on a real device. Other models are recognised and shown, but their settings may differ; see [docs/protocole.md](docs/protocole.md) (in French) for what has been confirmed.
+
+## Repository layout
 
 ```
 Sources/
-  NothingKit/    le protocole : trames, commandes, état de l'appareil (sans dépendance, testé)
-  NothingX/      l'application SwiftUI : liaison Bluetooth, fenêtre, barre des menus
-    Traductions/ l'anglais (les textes de l'app sont écrits en français)
-Tests/           tests de NothingKit, à partir d'octets relevés sur un vrai casque
-maquette/        maquettes HTML/CSS/JS, sans dépendance ni étape de construction
-  index.html     V1 : transposition directe de l'app mobile (tuiles et sous-pages)
-  v2.html        V2 : disposition pensée pour macOS (onglets, menus déroulants, barre des menus)
-  shared.js      icônes, données et briques communes aux deux
-  planche.html   planche de contrôle des visuels produit
+  NothingKit/    the protocol: frames, commands, device state (no dependency, tested)
+  NothingX/      the SwiftUI app: Bluetooth link, window, menu bar
+    Traductions/ English and Spanish (the app's strings are written in French)
+Tests/           NothingKit tests, built from bytes captured on a real headset
+maquette/        HTML/CSS/JS mockups the app was designed from
 tools/
-  build-app.sh         compile l'application et l'emballe en .app
-  app.sh               la construit et la lance depuis le projet
-  install.sh           la construit et l'installe dans /Applications
-  release.sh           fabrique l'archive à diffuser, sans image ni police de Nothing
-  make-icon.swift      dessine l'icône de l'application
-  build-assets.swift   fabrique les visuels produit à partir de vos propres sources
-  probe.swift          sonde Bluetooth en lecture seule
-  probe.sh             compile et lance la sonde
-docs/protocole.md      ce qui est vérifié du protocole
+  install.sh           builds the app and installs it in /Applications
+  fetch-images.sh      downloads the device pictures, which are not in the repository
+  build-app.sh         builds the app and packages it as a .app
+  app.sh               builds and runs it from the project folder
+  release.sh           makes the archive to distribute, without any Nothing picture or font
+  make-icon.swift      draws the app icon
+  build-assets.swift   builds the mockups' pictures from your own sources
+  probe.swift, probe.sh   read-only Bluetooth probe
+docs/protocole.md      what has been verified of the protocol (in French)
 ```
 
-## Travailler sur l'app
+Code comments, commit messages and the app's source strings are in French.
+
+## Working on the app
 
 ```sh
 tools/app.sh
 ```
 
-Ce script lance l'app depuis le dossier du projet, sans toucher à la copie installée. L'app vit dans la barre des menus : fermer la fenêtre ne la quitte pas, et elle ne garde une icône dans le Dock que tant que la fenêtre est ouverte. Avec « Ouvrir au démarrage du Mac » (onglet Appareil), elle est là dès l'ouverture de session et annonce l'appareil quand il se connecte. Ce réglage demande que l'app soit dans `/Applications`.
+runs the app from the project folder without touching the installed copy. The app lives in the menu bar: closing the window does not quit it, and it only keeps a Dock icon while the window is open. With "Open at login" (Device tab) it is there from the start of the session and announces the device when it connects; that setting needs the app to be in `/Applications`.
 
-macOS demande l'autorisation Bluetooth au premier lancement. Sans appareil sous la main, `tools/app.sh --demo` montre l'app avec un état factice. Les tests se lancent avec `swift test`.
+Without a device at hand, `tools/app.sh --demo` shows the app with made-up data. `swift test` runs the tests.
 
-L'app suit la langue du système : français, ou anglais pour toutes les autres langues. Pour forcer l'anglais : `tools/app.sh -AppleLanguages "(en)"`.
-
-Chaque réglage envoyé est suivi d'une relecture : l'écran montre ce que l'appareil a réellement retenu.
-
-### Confirmer les réglages sur un appareil
+### Confirming settings on a device
 
 ```sh
-tools/app.sh --verify rapport.txt
+tools/app.sh --verify report.txt
 ```
 
-L'app modifie tour à tour le mode de bruit, l'égaliseur, l'audio spatial, la faible latence, une commande et la courbe personnalisée, relit la réponse de l'appareil, remet chaque valeur d'origine, puis écrit le résultat dans `rapport.txt` (ignoré par git : il contient les trames brutes). C'est le moyen de savoir ce qui marche sur un modèle qui n'a pas encore été vérifié.
+The app changes, one after the other, the noise mode, the equaliser, spatial audio, low lag mode, one button mapping and the custom curve; reads the device's answer; puts every value back; then writes the result to `report.txt`. This is how to find out what works on a model that has not been verified yet.
 
-### Diffuser l'app
+### Distributing the app
 
 ```sh
 tools/release.sh
 ```
 
-produit `.build/NothingX-<version>.zip` : l'app seule, avec ses pictogrammes et les polices du système, prête à joindre à une version GitHub. L'utilisateur la dézippe, la glisse dans Applications et la lance. L'archive n'étant ni signée par un compte développeur Apple ni notarisée, macOS refuse le premier lancement : il faut alors ouvrir Réglages Système › Confidentialité et sécurité et cliquer sur « Ouvrir quand même ».
+produces `.build/NothingX-<version>.zip`: the app alone, with no Nothing picture or font (it then draws the device itself), ready to attach to a GitHub release. People unzip it, drag it to Applications and open it. The archive is neither signed with an Apple developer account nor notarised, so macOS refuses the first launch: open System Settings › Privacy & Security and click "Open Anyway".
 
-## Sécurité
+## Security
 
-- L'app ne fait aucune connexion réseau : ni statistiques, ni mise à jour automatique, ni compte. Elle n'a aucune dépendance tierce.
-- Elle ne demande qu'une autorisation, le Bluetooth, et ne parle qu'aux appareils déjà jumelés au Mac qui déclarent le service Nothing.
-- Ce que l'appareil envoie est traité comme non fiable : longueurs vérifiées, trames trop longues ou incohérentes écartées.
-- Les constructions locales sont signées sans certificat, avec une identité fixée sur l'identifiant de l'app pour que macOS garde l'accord Bluetooth d'une compilation à l'autre. Une app locale qui usurperait cet identifiant hériterait de cet accord : acceptable sur sa propre machine, à remplacer par une vraie signature pour une diffusion large.
-- L'app n'est pas en bac à sable.
+- The app makes no network connection: no analytics, no automatic update, no account. It has no third-party dependency. Only the install script goes online, for the device pictures, taken from a pinned revision of the Ear (web) repository.
+- It asks for one permission, Bluetooth, and only talks to devices already paired with the Mac that advertise the Nothing service.
+- What the device sends is treated as untrusted: lengths are checked, oversized or inconsistent frames are dropped.
+- Local builds are signed without a certificate, with an identity pinned to the app's identifier so that macOS keeps the Bluetooth permission from one build to the next. A local app impersonating that identifier would inherit the permission: acceptable on your own machine, to be replaced by a real signature for wide distribution.
+- The app is not sandboxed.
 
-## Voir les maquettes
+## What stays out of the repository
 
-```sh
-python3 -m http.server 4173 --directory maquette
-```
+Device pictures and fonts belong to Nothing (and to Lineto for Lettera Mono): they are not in the repository.
 
-Puis ouvrir `http://localhost:4173/v2.html`. La barre noire en bas de page pilote la maquette (thème, appareil connecté ou non, arrivée d'un nouvel appareil) et permet de passer d'une version à l'autre.
+- **Pictures**: `tools/install.sh` downloads them once from the public [Ear (web)](https://github.com/radiance-project/ear-web) repository into `originaux/ear-web/`, which git ignores. `NOTHING_SANS_IMAGES=1 tools/install.sh` skips that.
+- **Without pictures**, as in the screenshots above, the app draws the device and the large numbers itself, as dot matrices.
+- **Fonts**: the app uses system fonts (Bodoni 72 for names, the system monospaced font for labels).
 
-## Ce qui reste hors du dépôt
+If you have other files of your own, `originaux/` takes them:
 
-Les photos des appareils et les polices appartiennent à Nothing (et à Lineto pour Lettera Mono) : elles ne sont pas dans le dépôt. Sans elles tout fonctionne, comme sur les captures ci-dessus : l'app dessine elle-même l'appareil et les grands chiffres en matrice de points, et prend ses caractères dans les polices du système (Bodoni 72 pour les noms, la police à chasse fixe du système pour les étiquettes). Pour retrouver l'aspect d'origine sur votre machine, placez vos propres fichiers dans `originaux/`, que git ignore :
-
-| Dossier | Contenu | Utilisé par |
+| Folder | Content | Used by |
 |---|---|---|
-| `originaux/captures/` | captures d'écran de l'app mobile (1280 × 2772, nommées `26725.jpg`… comme attendu par le script) | maquettes |
-| `originaux/site/` | images enregistrées depuis le site Nothing | maquettes, fenêtre de l'app |
-| `originaux/ear-web/` | `b175_black.webp`, `b175_white.webp`, `b175_green.webp` : le casque vu de face | barre des menus |
-| `originaux/polices/` | `NType82-Headline.otf`, `LetteraMono-LL.otf`, `NDot-55.otf` | maquettes et app |
-| `originaux/icone.png` | une icône carrée de votre choix | app, à la place de l'icône fournie |
+| `originaux/ear-web/` | `<model>_<colour>.webp`, for example `b175_black.webp`: the device seen from the front | app |
+| `originaux/polices/` | `NType82-Regular.otf`, `LetteraMono-LL.otf`, `NDot-55.otf` | mockups and app |
+| `originaux/icone.png` | a square icon of your choice | app, instead of the provided icon |
 
-Les visuels des maquettes se fabriquent ensuite avec :
+## Roadmap
 
-```sh
-mkdir -p .build && swiftc -O tools/build-assets.swift -o .build/build-assets && .build/build-assets
-```
+1. Confirm the remaining writes (dual connection, bass enhancement).
+2. Complete the app: configurable shortcut, pairing a device that has never been connected to the Mac.
+3. Distribution: a downloadable archive, signed and notarised, to install without building.
+4. Extend to other models, whose capabilities differ.
 
-Le script recadre, détoure et range le tout dans `maquette/assets/`. `tools/app.sh` prend de son côté ce dont l'app a besoin à chaque construction.
+## Related projects
 
-## Sonder un appareil
+- [nothing-bar](https://github.com/bestK1ngArthur/nothing-bar): another menu bar app for macOS (GPL-3.0).
+- [Ear (web)](https://github.com/radiance-project/ear-web) and [BudsLink](https://github.com/maniacx/BudsLink): where the protocol documentation comes from. No code from these projects is included here.
 
-Appareil allumé et connecté au Mac en Bluetooth :
+## Licence
 
-```sh
-tools/probe.sh
-```
+The code is released under the [GPL-3.0](LICENSE): you may use, modify and redistribute it, provided you publish your changes under the same licence.
 
-La sonde n'envoie que des lectures. macOS demande l'autorisation Bluetooth au premier lancement.
-
-## Suite prévue
-
-1. Confirmer les écritures restantes (double connexion, renfort des basses).
-2. Compléter l'application : choix du raccourci, appairage d'un appareil jamais relié au Mac.
-3. Distribution : une archive téléchargeable, signée et notarisée, pour installer sans compiler.
-4. Étendre aux autres modèles, dont les capacités diffèrent.
-
-## Projets voisins
-
-- [nothing-bar](https://github.com/bestK1ngArthur/nothing-bar) : une app de barre des menus pour macOS existe déjà (GPL-3.0).
-- [Ear (web)](https://github.com/radiance-project/ear-web) et [BudsLink](https://github.com/maniacx/BudsLink) : sources de la documentation du protocole.
-
-Nothing, CMF et les noms de produits sont des marques de Nothing Technology Limited.
+Nothing, CMF and product names are trademarks of Nothing Technology Limited. This project is not affiliated with or endorsed by Nothing Technology.

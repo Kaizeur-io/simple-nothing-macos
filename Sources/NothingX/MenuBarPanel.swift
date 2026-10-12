@@ -5,7 +5,6 @@ import SwiftUI
 /// Le panneau qui s'ouvre depuis la barre des menus : l'essentiel sans ouvrir la fenêtre.
 struct MenuBarPanel: View {
     @ObservedObject var headset: Headset
-    @AppStorage("finish") private var finish = Finish.darkGrey
     @ObservedObject private var language = Language.shared
 
     private var connected: Bool { headset.status == .connected }
@@ -83,14 +82,7 @@ struct MenuBarPanel: View {
 
     private var header: some View {
         HStack(spacing: 12) {
-            Group {
-                if headset.model == .headphonePro || headset.name.isEmpty, let image = finish.frontImage {
-                    Image(nsImage: image).resizable().interpolation(.high).scaledToFit()
-                } else {
-                    DeviceGlyph(isHeadphones: headset.model?.isHeadphones != false).padding(6)
-                }
-            }
-            .frame(width: 64, height: 64).opacity(connected ? 1 : 0.35)
+            DevicePicture(model: headset.shownModel).frame(width: 64, height: 64).opacity(connected ? 1 : 0.35)
             VStack(alignment: .leading, spacing: 6) {
                 Text(headset.name.isEmpty ? tr("Aucun appareil") : headset.name).font(.nSerif(18)).foregroundStyle(Color.nText)
                     .lineLimit(1).minimumScaleFactor(0.75)

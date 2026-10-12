@@ -109,9 +109,14 @@
 "Couleur" = "Colour";
 "N° de série" = "Serial number";
 "Adresse Bluetooth" = "Bluetooth address";
-"Gris foncé" = "Dark grey";
-"Gris clair" = "Light grey";
-"Vert clair" = "Light green";
+"Noir" = "Black";
+"Blanc" = "White";
+"Gris" = "Grey";
+"Argent" = "Silver";
+"Vert" = "Green";
+"Bleu" = "Blue";
+"Jaune" = "Yellow";
+"Rose" = "Pink";
 "Ce modèle n'a pas encore été vérifié : certains réglages peuvent manquer." = "This model has not been verified yet: some settings may be missing.";
 
 /* Barre des menus */

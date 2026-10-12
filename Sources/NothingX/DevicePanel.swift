@@ -2,34 +2,8 @@ import AppKit
 import NothingKit
 import SwiftUI
 
-/// Coloris du CMF Headphone Pro. Les images sont copiées dans l'app par tools/app.sh quand elles existent.
-enum Finish: String, CaseIterable {
-    case darkGrey = "dark-grey", lightGrey = "light-grey", lightGreen = "light-green"
-
-    var label: String { self == .darkGrey ? "Gris foncé" : self == .lightGrey ? "Gris clair" : "Vert clair" }
-    var swatch: Color { Color(red: red, green: green, blue: blue) }
-    private var red: Double { self == .darkGrey ? 0.18 : self == .lightGrey ? 0.84 : 0.66 }
-    private var green: Double { self == .darkGrey ? 0.18 : self == .lightGrey ? 0.84 : 0.82 }
-    private var blue: Double { self == .darkGrey ? 0.21 : self == .lightGrey ? 0.83 : 0.78 }
-
-    /// Vue de trois quarts, pour la fenêtre.
-    var image: NSImage? { Self.cached("cmf-headphone-pro-\(rawValue)") }
-    /// Vue de face, plus lisible en petit.
-    var frontImage: NSImage? { Self.cached("cmf-headphone-pro-front-\(rawValue)") ?? image }
-
-    /// Les images sont lues une seule fois : l'écran se redessine à chaque réponse de l'appareil.
-    private static var cache: [String: NSImage?] = [:]
-    private static func cached(_ name: String) -> NSImage? {
-        if let known = cache[name] { return known }
-        let image = Bundle.main.image(forResource: name)
-        cache[name] = image
-        return image
-    }
-}
-
 struct DevicePanel: View {
     @ObservedObject var headset: Headset
-    @AppStorage("finish") private var finish = Finish.darkGrey
 
     private var connected: Bool { headset.status == .connected }
 
@@ -48,12 +22,8 @@ struct DevicePanel: View {
         .background(Color.nSurface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
-    @ViewBuilder private var hero: some View {
-        if headset.model == .headphonePro || headset.name.isEmpty, let image = finish.image {
-            Image(nsImage: image).resizable().interpolation(.high).scaledToFit()
-        } else {
-            DeviceGlyph(isHeadphones: headset.model?.isHeadphones != false).padding(28).frame(maxWidth: .infinity, maxHeight: .infinity)
-        }
+    private var hero: some View {
+        DevicePicture(model: headset.shownModel, large: true).frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     @ViewBuilder private var battery: some View {

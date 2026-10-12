@@ -29,11 +29,23 @@ cp -R Sources/NothingX/Traductions/*.lproj "$res/"
 # et montre sinon des pictogrammes et des polices du système.
 # NOTHING_PUBLIC=1 construit la version à diffuser, sans rien de tout cela.
 if [ -z "$NOTHING_PUBLIC" ]; then
-  cp maquette/assets/products/cmf-headphone-pro-*.png "$res/" 2>/dev/null || true
   cp originaux/polices/*.otf "$res/" 2>/dev/null || true
-  for pair in black:dark-grey white:light-grey green:light-green; do
-    src="originaux/ear-web/b175_${pair%%:*}.webp"
-    if [ -f "$src" ]; then sips -s format png -Z 480 "$src" --out "$res/cmf-headphone-pro-front-${pair##*:}.png" >/dev/null 2>&1; fi
+  # Vues de face : <modèle>_<couleur>.webp devient device-<MODÈLE>-<couleur>.png. La conversion est
+  # gardée dans .build/images pour ne pas la refaire à chaque construction.
+  mkdir -p .build/images
+  for src in originaux/ear-web/*.webp; do
+    [ -f "$src" ] || continue
+    base=$(basename "$src" .webp)
+    out=".build/images/device-$(echo "${base%%_*}" | tr a-z A-Z)-${base#*_}.png"
+    if [ ! -f "$out" ] || [ "$src" -nt "$out" ]; then
+      sips -s format png -Z 480 "$src" --out "$out" >/dev/null 2>&1 || continue
+    fi
+    cp "$out" "$res/"
+  done
+  # Vues de trois quarts du CMF Headphone Pro, fabriquées par tools/build-assets.swift à partir de vos propres sources.
+  for pair in dark-grey:black light-grey:white light-green:green; do
+    src="maquette/assets/products/cmf-headphone-pro-${pair%%:*}.png"
+    if [ -f "$src" ]; then cp "$src" "$res/device-B175-${pair##*:}-34.png"; fi
   done
 fi
 

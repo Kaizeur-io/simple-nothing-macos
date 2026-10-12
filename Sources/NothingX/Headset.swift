@@ -13,6 +13,8 @@ final class Headset: NSObject, ObservableObject {
     @Published private(set) var address = ""
 
     var model: Model? { Model.named(name) }
+    /// Le modèle à dessiner : celui qui est relié, sinon le dernier qu'on a vu.
+    var shownModel: Model? { model ?? Model.named(UserDefaults.standard.string(forKey: "lastDevice") ?? "") }
 
     /// Ce qu'il faut faire quand aucun appareil n'est affiché.
     var hint: String {
@@ -157,6 +159,7 @@ final class Headset: NSObject, ObservableObject {
         guard link.open() else { return }
         self.link = link
         name = device.name ?? ""
+        UserDefaults.standard.set(name, forKey: "lastDevice")
         address = (device.addressString ?? "").uppercased().replacingOccurrences(of: "-", with: ":")
         status = .connecting
         disconnectWatch = device.register(forDisconnectNotification: self, selector: #selector(deviceDisconnected(_:device:)))
@@ -207,7 +210,7 @@ final class Headset: NSObject, ObservableObject {
     }
 
     private func loadDemo() {
-        name = "CMF Headphone Pro"
+        name = Launch.value("--demo-name") ?? "CMF Headphone Pro"
         address = "00:00:00:00:00:00"
         status = .connected
         let replies: [(UInt16, [UInt8])] = [
