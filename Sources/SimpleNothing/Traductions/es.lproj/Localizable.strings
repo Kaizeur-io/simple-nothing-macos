@@ -153,7 +153,24 @@
 "Connecter" = "Conectar";
 "Déconnecter" = "Desconectar";
 "L'appareil redémarre quand on change ce réglage" = "El dispositivo se reinicia al cambiar este ajuste";
-\n\n/* Apparence, gestes des écouteurs */\n"Apparence" = "Apariencia";\n"Clair" = "Claro";\n"Sombre" = "Oscuro";\n"Appuyez deux fois" = "Pulsa dos veces";\n"Appuyez trois fois" = "Pulsa tres veces";\n"Appuyez deux fois et maintenez" = "Pulsa dos veces y mantén";\n"Tournez" = "Gira";\n"Écouteur gauche" = "Auricular izquierdo";\n"Écouteur droit" = "Auricular derecho";\n"Lecture / pause" = "Reproducir / pausar";\n"Piste précédente" = "Pista anterior";\n"Piste suivante" = "Pista siguiente";\n"Volume +" = "Subir volumen";\n"Volume −" = "Bajar volumen";\n"Déclencheur photo" = "Disparador de cámara";\n
+
+/* Apparence, gestes des écouteurs */
+"Apparence" = "Apariencia";
+"Clair" = "Claro";
+"Sombre" = "Oscuro";
+"Appuyez deux fois" = "Pulsa dos veces";
+"Appuyez trois fois" = "Pulsa tres veces";
+"Appuyez deux fois et maintenez" = "Pulsa dos veces y mantén";
+"Tournez" = "Gira";
+"Écouteur gauche" = "Auricular izquierdo";
+"Écouteur droit" = "Auricular derecho";
+"Lecture / pause" = "Reproducir / pausar";
+"Piste précédente" = "Pista anterior";
+"Piste suivante" = "Pista siguiente";
+"Volume +" = "Subir volumen";
+"Volume −" = "Bajar volumen";
+"Déclencheur photo" = "Disparador de cámara";
+
 "Appareil introuvable : vérifiez qu'il est allumé et à portée." = "Dispositivo no encontrado: comprueba que está encendido y cerca.";
 
 /* Revue d'interface */
@@ -165,3 +182,4 @@
 "Réglages…" = "Ajustes…";
 "Les autres gestes de la molette ne se règlent pas : un appui pour lecture ou pause, deux pour le titre suivant, trois pour le précédent, et le défilement pour le volume." = "Los demás gestos de la rueda no se pueden cambiar: una pulsación para reproducir o pausar, dos para la pista siguiente, tres para la anterior, y gira para el volumen.";
 "Allumez votre appareil, puis cliquez sur Connecter." = "Enciende tu dispositivo y haz clic en Conectar.";
+"%@ : %@" = "%@: %@";

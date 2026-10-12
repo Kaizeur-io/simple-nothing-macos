@@ -29,7 +29,7 @@ To check an install without a device, run `tools/app.sh --demo --snapshot out.pn
 - `swift test` runs the protocol tests (no Bluetooth needed).
 - `tools/app.sh` builds and runs from the project folder; `--demo` uses made-up data. Launch options are listed at the top of `Sources/SimpleNothing/SimpleNothingApp.swift`.
 - Only one process can hold the device's Bluetooth channel: quit the installed app before running another copy against a real device.
-- UI text is written in French in the code and passed through `tr("…")`. Every new string needs its line in both `en.lproj` and `es.lproj` under `Sources/SimpleNothing/Traductions/`.
+- UI text is written in French in the code and passed through `tr("…")`. Every new string needs its line in both `en.lproj` and `es.lproj` under `Sources/SimpleNothing/Traductions/`; run `tools/check-translations.sh` after adding one.
 - The app's name is only written in `tools/app-Info.plist` (and in the scripts' paths); the code reads it from there.
 - The code is GPL-3.0. Protocol facts come from Ear (web) (AGPL-3.0) and BudsLink (GPL-3.0); do not paste code from AGPL projects.
 - `docs/protocole.md` records what has been verified on a real device. Do not send write commands to someone's headphones without asking them; `tools/app.sh --verify report.txt` is the supported way to test writes and restores every value it changes.

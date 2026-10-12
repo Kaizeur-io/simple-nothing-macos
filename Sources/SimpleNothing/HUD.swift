@@ -99,7 +99,7 @@ struct ArrivalCard: View {
                 }
                 if headset.state.battery.count > 1 { BatterySplit(battery: headset.state.battery).padding(.top, 10) }
                 if let noise = headset.state.noise {
-                    Text(tr("Réduction du bruit") + " : " + tr(noise.summary).lowercased()).font(.system(size: 12)).foregroundStyle(Color.nMuted).padding(.top, 6)
+                    Text(tr("%@ : %@", tr("Réduction du bruit"), tr(noise.summary).lowercased())).font(.system(size: 12)).foregroundStyle(Color.nMuted).padding(.top, 6)
                 }
             }
             .padding(.horizontal, 20).padding(.top, 20).padding(.bottom, 18).frame(width: 300)

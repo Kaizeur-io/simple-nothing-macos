@@ -4,11 +4,21 @@ English · [Français](README.fr.md)
 
 A macOS app to control Nothing and CMF headphones and earbuds, which the official app only supports on phones. This project is not affiliated with or endorsed by Nothing Technology.
 
-![The app window](docs/apercu-fenetre.png)
+![The app window and its menu bar panel](docs/presentation.png)
 
-| In the menu bar | When the device connects |
-|---|---|
-| ![Menu bar panel](docs/apercu-barre-des-menus.png) | ![Connection card](docs/apercu-carte.png) |
+Light or dark, your choice:
+
+![The window in light and dark appearance](docs/presentation-clair-sombre.png)
+
+Controls, dual connection, device and app settings:
+
+![The other four tabs](docs/presentation-onglets.png)
+
+Outside the window: a card when the device connects, the menu bar panel, and notices for the keyboard shortcut and a low battery.
+
+![Connection card, menu bar panel and notices](docs/presentation-barre-des-menus.png)
+
+These pictures are made from the app itself by `tools/make-screens.sh`, with the public build: the device is drawn in dots. Installed with `tools/install.sh`, the app shows the real product pictures.
 
 ## Install
 
@@ -49,6 +59,8 @@ tools/
   build-app.sh         builds the app and packages it as a .app
   app.sh               builds and runs it from the project folder
   release.sh           makes the archive to distribute, without any Nothing picture or font
+  make-screens.sh      makes the pictures of this page from the app in demo mode
+  check-translations.sh  checks that every interface text has its English and Spanish translation
   make-icon.swift      draws the app icon
   build-assets.swift   builds the mockups' pictures from your own sources
   probe.swift, probe.sh   read-only Bluetooth probe

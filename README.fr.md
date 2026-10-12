@@ -4,11 +4,21 @@
 
 Une application macOS pour régler les casques et écouteurs Nothing et CMF, que l'app officielle ne couvre que sur téléphone. Ce projet n'est ni affilié à Nothing Technology, ni soutenu par elle.
 
-![La fenêtre de l'application](docs/apercu-fenetre.png)
+![La fenêtre de l'app et son panneau de la barre des menus](docs/presentation.png)
 
-| Dans la barre des menus | À la connexion |
-|---|---|
-| ![Panneau de la barre des menus](docs/apercu-barre-des-menus.png) | ![Carte de connexion](docs/apercu-carte.png) |
+Clair ou sombre, au choix :
+
+![La fenêtre en apparence claire et sombre](docs/presentation-clair-sombre.png)
+
+Commandes, double connexion, appareil et réglages de l'app :
+
+![Les quatre autres onglets](docs/presentation-onglets.png)
+
+Hors de la fenêtre : une carte quand l'appareil se connecte, le panneau de la barre des menus, et les confirmations du raccourci clavier et de la batterie faible.
+
+![Carte de connexion, panneau de la barre des menus et confirmations](docs/presentation-barre-des-menus.png)
+
+Ces visuels sont fabriqués à partir de l'app elle-même par `tools/make-screens.sh`, avec la version publique : l'appareil y est dessiné en points. Installée par `tools/install.sh`, l'app montre les vraies photos des produits.
 
 ## Installation
 
@@ -47,6 +57,8 @@ tools/
   install.sh           la construit et l'installe dans /Applications
   fetch-images.sh      va chercher les photos des appareils, qui ne sont pas dans le dépôt
   release.sh           fabrique l'archive à diffuser, sans image ni police de Nothing
+  make-screens.sh      fabrique les visuels de cette page à partir de l'app en mode démo
+  check-translations.sh  vérifie que chaque texte de l'interface a sa traduction anglaise et espagnole
   make-icon.swift      dessine l'icône de l'application
   build-assets.swift   fabrique les visuels produit à partir de vos propres sources
   probe.swift          sonde Bluetooth en lecture seule
